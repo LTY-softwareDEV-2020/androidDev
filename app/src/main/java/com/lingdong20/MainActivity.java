@@ -97,16 +97,16 @@ import database.LingDongDB;
     /**LingDongRootFolder此程序自己的文件目录*/
     String LingDongRootFolder = "/sdcard/LingDong/";
     /**发送离线文件的按钮*/
-    private Button btnSend_offlinefiles;
+    private com.getbase.floatingactionbutton.FloatingActionButton btnSend_offlinefiles;
     /**弹出对话框下载离线文件的按钮**/
-    private Button btnDown_offlinefiles;
+    private com.getbase.floatingactionbutton.FloatingActionButton btnDown_offlinefiles;
     /**点两次返回按键退出程序的时间*/
     private long mExitTime;
     /**显示离线文件传输的日志提醒的Textview，默认情况下文本为空*/
     public static TextView offline_trans_log;
     /**在MainActivity声明两个Fab按钮，类FloatingActionButton是引入自开源库library*/
-    private com.getbase.floatingactionbutton.FloatingActionButton fab_CreateConnection;
-    private com.getbase.floatingactionbutton.FloatingActionButton fab_ScanToJoin;
+    private Button fab_CreateConnection;
+    private Button fab_ScanToJoin;
     private static String LOG_TAG = "WifiBroadcastActivity";
     private boolean wifiFlag = true;//扫描wifi的子线程的标志位，如果已经连接上正确的wifi热点，线程将结束
     private String address;
@@ -896,8 +896,8 @@ import database.LingDongDB;
 
         /*******************************************/
         //设备之间连接的两个fab的定义以及初始化
-        fab_CreateConnection = (com.getbase.floatingactionbutton.FloatingActionButton) findViewById(R.id.fab_CreateConnection);
-        fab_ScanToJoin = (com.getbase.floatingactionbutton.FloatingActionButton) findViewById(R.id.fab_ScanToJoin);
+        fab_CreateConnection = (Button) findViewById(R.id.btnSend_offlinefiles);
+        fab_ScanToJoin = (Button) findViewById(R.id.btnDown_offlinefiles);
 
         multiple_actions = (FloatingActionsMenu) findViewById(R.id.multiple_actions);
         rl_root = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -922,7 +922,7 @@ import database.LingDongDB;
         /*****************************************/
 
         //控件初始化，设置监听事件
-        btnSend_offlinefiles = (Button) findViewById(R.id.btnSend_offlinefiles);
+        btnSend_offlinefiles = (com.getbase.floatingactionbutton.FloatingActionButton) findViewById(R.id.fab_CreateConnection);
         btnSend_offlinefiles.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -943,7 +943,7 @@ import database.LingDongDB;
         });
 
         //控件初始化，设置监听事件
-        btnDown_offlinefiles = (Button) findViewById(R.id.btnDown_offlinefiles);
+        btnDown_offlinefiles = (com.getbase.floatingactionbutton.FloatingActionButton) findViewById(R.id.fab_ScanToJoin);
         //给下载按钮添加一个监听器
         btnDown_offlinefiles.setOnClickListener(new View.OnClickListener() {
             @Override
