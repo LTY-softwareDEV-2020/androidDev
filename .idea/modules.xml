@@ -2,6 +2,9 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/AndroidProjects-androidDev.iml" filepath="$PROJECT_DIR$/AndroidProjects-androidDev.iml" group="androidDev" />
+      <module fileurl="file://$PROJECT_DIR$/app/AndroidProjects-androidDev-app.iml" filepath="$PROJECT_DIR$/app/AndroidProjects-androidDev-app.iml" group="androidDev/app" />
+      <module fileurl="file://$PROJECT_DIR$/library/AndroidProjects-androidDev-library.iml" filepath="$PROJECT_DIR$/library/AndroidProjects-androidDev-library.iml" group="androidDev/library" />
       <module fileurl="file://$PROJECT_DIR$/LingDong2.0.iml" filepath="$PROJECT_DIR$/LingDong2.0.iml" />
       <module fileurl="file://$PROJECT_DIR$/androidDev.iml" filepath="$PROJECT_DIR$/androidDev.iml" group="androidDev" />
       <module fileurl="file://$PROJECT_DIR$/app/androidDev-app.iml" filepath="$PROJECT_DIR$/app/androidDev-app.iml" group="androidDev/app" />

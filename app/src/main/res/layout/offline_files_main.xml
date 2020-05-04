@@ -17,7 +17,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:layout_marginTop="10dp"
-        android:text="灵动快传文件漂流瓶系统"
+        android:text="创建或加入节连接以开始"
         android:textColor="#FFFFFF"
         android:textSize="23sp" />
 
@@ -29,7 +29,7 @@
         android:layout_gravity="center"
         android:layout_marginTop="15dp"
         android:background="@drawable/offline_files_button_shape"
-        android:text="扔一个文件漂流瓶"
+        android:text="创建连接"
         android:textColor="#FFFFFF"
         android:textSize="18sp" />
 
@@ -41,7 +41,7 @@
         android:layout_gravity="center"
         android:layout_marginTop="18dp"
         android:background="@drawable/offline_files_button_shape"
-        android:text="捞一个文件漂流瓶"
+        android:text="加入连接"
         android:textColor="#FFFFFF"
         android:textSize="18sp" />
 
@@ -70,7 +70,7 @@
             android:layout_alignParentBottom="true"
             android:layout_centerHorizontal="true"
             android:layout_gravity="center"
-            android:text="        本软件大数据由阿里云提供平台支持\n数据分析由湖北大学根号三团队提供技术支持"
+            android:text="-"
             android:textColor="#FFFFFF"
             android:textSize="11dp" />
 

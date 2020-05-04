@@ -11,7 +11,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
         android:layout_marginTop="30dp"
-        android:text="灵动快传文件传送界面"
+        android:text="文件发送中"
         android:textColor="#FFFFFF"
         android:textSize="23sp" />
 
@@ -31,7 +31,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:gravity="center"
-            android:text="这里显示的是本机IP"
+            android:text="本机IP"
             android:textColor="#FFFAFA"
             android:textSize="23dp" />
 
@@ -47,7 +47,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center"
-                android:text="下面为对方的IP地址："
+                android:text="目标IP："
                 android:textColor="#FFFFFF"
                 android:textSize="23dp" />
 
@@ -56,7 +56,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center"
-                android:text="(一般系统已自动填好，亦可手动填写)"
+                android:text="(亦可手动填写)"
                 android:textColor="#FFFFFF"
                 android:textSize="15dp" />
 
