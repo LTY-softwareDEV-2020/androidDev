@@ -3,11 +3,13 @@
  */
 package connectpc;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
@@ -52,6 +54,19 @@ public class Connect_PC  extends Activity {
     //文字剪贴
     private Button btn_connect_pc_textcutpaste;
 
+    private Button btn_startGravityControl;
+
+    private Button btn_stopGravityControl;
+
+    private Button btn_LeftMouse;
+
+    private Button btn_RightMouse;
+
+    private touchableView view_trackPad;
+
+    private mouseManager mouseManager = new mouseManager();
+
+    @SuppressLint("WrongViewCast")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -77,6 +92,17 @@ public class Connect_PC  extends Activity {
         btn_connect_pc_shutdownpresentscreen = (Button) findViewById(R.id.btn_connect_pc_shutdownpresentscreen);
         //文字剪贴按钮
         btn_connect_pc_textcutpaste = (Button) findViewById(R.id.btn_connect_pc_textcutpaste);
+
+        btn_startGravityControl = findViewById(R.id.startGravityControl);
+
+        btn_stopGravityControl = findViewById(R.id.stopGravityControl);
+
+        btn_LeftMouse = findViewById(R.id.LeftMouse);
+
+        btn_RightMouse = findViewById(R.id.RightMouse);
+
+        view_trackPad = findViewById(R.id.trackPad);
+        view_trackPad.setMouseManager(this.mouseManager);//
 
         /**设置九宫格按钮的监听事件*/
         btn_connect_pc_ESC.setOnClickListener(new View.OnClickListener() {
@@ -206,6 +232,31 @@ public class Connect_PC  extends Activity {
         });
 
 
+        btn_LeftMouse.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if( !mouseManager.isConnected() ) {
+                    mouseManager.connect(DuiFangde_IP2, 2345);
+                }
+                else{
+                    mouseManager.sendKey("L");
+                }
+            }
+        });
+
+       btn_RightMouse.setOnClickListener(new View.OnClickListener() {
+           @Override
+           public void onClick(View view) {
+               if( !mouseManager.isConnected() ) {
+                   mouseManager.connect(DuiFangde_IP2, 2345);
+               }
+               else{
+                   mouseManager.sendKey("R");
+               }
+           }
+       });
+
+
     }
 
 
@@ -250,7 +301,6 @@ public class Connect_PC  extends Activity {
             }
 
         }).start();
-
     }
 
 }

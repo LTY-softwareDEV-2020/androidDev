@@ -576,9 +576,7 @@ import database.LingDongDB;
      * 获取设备唯一的标志码
      */
     public String getDeviceID() {
-        TelephonyManager telephonyManager = (TelephonyManager) this.getSystemService(Context.TELEPHONY_SERVICE);
-        String imei = telephonyManager.getDeviceId();
-        return imei;
+        return "10534";
     }
 
     public String getAndroidVersion() {

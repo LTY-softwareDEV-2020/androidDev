@@ -25,7 +25,6 @@
         android:textSize="18dp"
         android:textColor="@color/white"/>
 
-
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -99,8 +98,6 @@
 
     </LinearLayout>
 
-
-
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -166,8 +163,8 @@
 
     </LinearLayout>
 
-
     <Button
+        android:visibility="gone"
         android:id="@+id/btn_connect_pc_textcutpaste"
         android:background="@drawable/offline_files_button_shape"
         android:layout_gravity="center"
@@ -178,8 +175,67 @@
         android:textSize="18dp"
         android:textColor="@color/white"/>
 
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="15dp"
+        android:orientation="horizontal"
+        android:layout_gravity="center"><Button
+        android:id="@+id/startGravityControl"
+        android:background="@drawable/offline_files_button_shape"
+        android:layout_gravity="center"
+        android:layout_width="150dp"
+        android:layout_height="wrap_content"
+        android:layout_marginRight="2dp"
+        android:text="启动重力控制"
+        android:textSize="18dp"
+        android:textColor="@color/white"/>
 
+        <Button
+            android:id="@+id/stopGravityControl"
+            android:background="@drawable/offline_files_button_shape"
+            android:layout_gravity="center"
+            android:layout_width="150dp"
+            android:layout_height="wrap_content"
+            android:text="关闭重力控制"
+            android:textSize="18dp"
+            android:textColor="@color/white"/>
 
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="15dp"
+        android:orientation="horizontal"
+        android:layout_gravity="center">
+        <Button
+        android:id="@+id/LeftMouse"
+        android:background="@drawable/offline_files_button_shape"
+        android:layout_gravity="center"
+        android:layout_width="150dp"
+        android:layout_height="wrap_content"
+        android:layout_marginRight="2dp"
+        android:text="左键"
+        android:textSize="18dp"
+        android:textColor="@color/white"/>
 
+        <Button
+            android:id="@+id/RightMouse"
+            android:background="@drawable/offline_files_button_shape"
+            android:layout_gravity="center"
+            android:layout_width="150dp"
+            android:layout_height="wrap_content"
+            android:text="右键"
+            android:textSize="18dp"
+            android:textColor="@color/white"/>
 
+    </LinearLayout>
+
+    <connectpc.touchableView
+        android:id="@+id/trackPad"
+        android:layout_marginTop="15dp"
+        android:layout_gravity="center"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        />
 </LinearLayout>
