@@ -6,8 +6,13 @@ package connectpc;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -66,6 +71,10 @@ public class Connect_PC  extends Activity {
 
     private mouseManager mouseManager = new mouseManager();
 
+    private SensorManager sm;
+    private SensorEventListener myAccelerometerListener;
+    int senSorTYPE = Sensor.TYPE_ROTATION_VECTOR     ;//传感器类型
+
     @SuppressLint("WrongViewCast")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -108,42 +117,42 @@ public class Connect_PC  extends Activity {
         btn_connect_pc_ESC.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Client(DuiFangde_IP2,1234,"01esc");
+                Client(DuiFangde_IP2,1346,"01esc");
             }
         });
 
         btn_connect_pc_UP.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Client(DuiFangde_IP2,1234,"01up");
+                Client(DuiFangde_IP2,1346,"01up");
             }
         });
 
         btn_connect_pc_ALT_TAB.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Client(DuiFangde_IP2,1234,"01alttab");
+                Client(DuiFangde_IP2,1346,"01alttab");
             }
         });
 
         btn_connect_pc_LEFT.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Client(DuiFangde_IP2,1234,"01left");
+                Client(DuiFangde_IP2,1346,"01left");
             }
         });
 
         btn_connect_pc_ENTER.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Client(DuiFangde_IP2,1234,"01enter");
+                Client(DuiFangde_IP2,1346,"01enter");
             }
         });
 
         btn_connect_pc_RIGHT.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Client(DuiFangde_IP2,1234,"01right");
+                Client(DuiFangde_IP2,1346,"01right");
             }
         });
 
@@ -151,21 +160,21 @@ public class Connect_PC  extends Activity {
         btn_connect_pc_WIN.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Client(DuiFangde_IP2,1234,"01win");
+                Client(DuiFangde_IP2,1346,"01win");
             }
         });
 
         btn_connect_pc_DOWN.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Client(DuiFangde_IP2,1234,"01down");
+                Client(DuiFangde_IP2,1346,"01down");
             }
         });
 
         btn_connect_pc_ScreenCut.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Client(DuiFangde_IP2,1234,"01screencut");
+                Client(DuiFangde_IP2,1346,"01screencut");
             }
         });
 
@@ -186,7 +195,7 @@ public class Connect_PC  extends Activity {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
 
-                        Client(DuiFangde_IP2,1234,"01shutdownpc");
+                        Client(DuiFangde_IP2,1346,"01shutdownpc");
                     }
                 });
 
@@ -200,7 +209,7 @@ public class Connect_PC  extends Activity {
         btn_connect_pc_shutdownpresentscreen.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Client(DuiFangde_IP2,1234,"01shutdownpresentscreen");
+                Client(DuiFangde_IP2,1346,"01shutdownpresentscreen");
             }
         });
 
@@ -255,8 +264,59 @@ public class Connect_PC  extends Activity {
                }
            }
        });
+        //重力传感器设置
+        //SensorManager代表了各类传感器的集合
+
+        myAccelerometerListener = new SensorEventListener(){
+            //复写onSensorChanged方法
+            float lastX = 0,lastY = 0,lastZ = 0;
+            public void onSensorChanged(SensorEvent sensorEvent){
+                String data = "";
+                for( float value:sensorEvent.values ){
+                    data = data + value+"\t";
+                }
+                mouseManager.sendMovement("se\t"+data);
 
 
+                if(sensorEvent.sensor.getType() == senSorTYPE ){
+                    float X_lateral = sensorEvent.values[0];
+                    float Y_longitudinal = sensorEvent.values[1];
+                    float Z_vertical = sensorEvent.values[2];
+                    if(lastX == 0 && lastY ==0 && lastZ == 0 ){
+                        lastX = X_lateral;
+                        lastY = Y_longitudinal;
+                        lastZ = Z_vertical;
+                        return;
+                    }
+                    else{
+                        int rate = 10;//放大率
+                        int relative_X = (int)((X_lateral - lastX)*rate);
+                        int relative_Y = (int)((Y_longitudinal - lastY)*rate);
+                        int relative_Z = (int)((Z_vertical - lastZ)*rate);
+                        if(relative_X != 0 || relative_Y != 0 || relative_Z !=0){
+                            mouseManager.sendMovement((int)((relative_X)*10)+"\t"+(int)((relative_Y)*10));
+                        }
+                        lastX = X_lateral;
+                        lastY = Y_longitudinal;
+                        lastZ = Z_vertical;
+                    }
+                }
+            }
+            //复写onAccuracyChanged方法
+            public void onAccuracyChanged(Sensor sensor , int accuracy){
+
+            }
+        };
+        sm = (SensorManager) getSystemService(SENSOR_SERVICE);
+        sm.registerListener( myAccelerometerListener,sm.getDefaultSensor(senSorTYPE),SensorManager.SENSOR_DELAY_FASTEST);
+    }
+    public void onPause(){
+        /*
+         * 很关键的部分：注意，说明文档中提到，即使activity不可见的时候，感应器依然会继续的工作
+         * 所以一定要在onPause方法中关闭触发器，
+         * */
+        sm.unregisterListener(myAccelerometerListener);
+        super.onPause();
     }
 
 
@@ -275,13 +335,11 @@ public class Connect_PC  extends Activity {
                 DataOutputStream dos = null;
                 try
                 {
-
                     socket = new Socket();
                     socket.connect(new InetSocketAddress(ipAddress, port));
                     dos = new DataOutputStream(socket.getOutputStream());
                     dos.writeUTF(zhiling);// 传送的指令
                     dos.flush();
-
                 } catch (Exception e) {
                     e.printStackTrace();
                 } finally {

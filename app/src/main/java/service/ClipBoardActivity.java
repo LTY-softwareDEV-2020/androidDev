@@ -109,7 +109,7 @@ public class ClipBoardActivity extends Activity implements OnClickListener {
 
 				Log.i("tag", "onReceive: " + value);
 
-				Client(Connect_PC.DuiFangde_IP2,1234);
+				Client(Connect_PC.DuiFangde_IP2,1346);
 
 				//Log.i("tag", "onReceive: " + value);
 
@@ -117,7 +117,7 @@ public class ClipBoardActivity extends Activity implements OnClickListener {
 				{
 					public void run()
 					{
-						//Client("192.168.191.4",1234);
+						//Client("192.168.191.4",1346);
 						try {
 
 							Thread.sleep(1000);
