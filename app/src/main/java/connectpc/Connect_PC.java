@@ -26,6 +26,8 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.List;
 
 import filestrans.Files_Trans_Activity;
 import service.ClipBoardActivity;
@@ -73,8 +75,8 @@ public class Connect_PC  extends Activity {
 
     private SensorManager sm;
     private SensorEventListener myAccelerometerListener;
-    int senSorTYPE = Sensor.TYPE_ROTATION_VECTOR     ;//传感器类型
-
+    int senSorTYPE = Sensor.TYPE_ACCELEROMETER    ;//传感器类型
+    private boolean gravityControlEnable = false;
     @SuppressLint("WrongViewCast")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -264,42 +266,28 @@ public class Connect_PC  extends Activity {
                }
            }
        });
+
+        btn_startGravityControl.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                gravityControlEnable = true;
+            }
+        });
+        btn_stopGravityControl.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                gravityControlEnable = false;
+            }
+        });
+
+
         //重力传感器设置
         //SensorManager代表了各类传感器的集合
 
         myAccelerometerListener = new SensorEventListener(){
-            //复写onSensorChanged方法
-            float lastX = 0,lastY = 0,lastZ = 0;
             public void onSensorChanged(SensorEvent sensorEvent){
-                String data = "";
-                for( float value:sensorEvent.values ){
-                    data = data + value+"\t";
-                }
-                mouseManager.sendMovement("se\t"+data);
-
-
-                if(sensorEvent.sensor.getType() == senSorTYPE ){
-                    float X_lateral = sensorEvent.values[0];
-                    float Y_longitudinal = sensorEvent.values[1];
-                    float Z_vertical = sensorEvent.values[2];
-                    if(lastX == 0 && lastY ==0 && lastZ == 0 ){
-                        lastX = X_lateral;
-                        lastY = Y_longitudinal;
-                        lastZ = Z_vertical;
-                        return;
-                    }
-                    else{
-                        int rate = 10;//放大率
-                        int relative_X = (int)((X_lateral - lastX)*rate);
-                        int relative_Y = (int)((Y_longitudinal - lastY)*rate);
-                        int relative_Z = (int)((Z_vertical - lastZ)*rate);
-                        if(relative_X != 0 || relative_Y != 0 || relative_Z !=0){
-                            mouseManager.sendMovement((int)((relative_X)*10)+"\t"+(int)((relative_Y)*10));
-                        }
-                        lastX = X_lateral;
-                        lastY = Y_longitudinal;
-                        lastZ = Z_vertical;
-                    }
+                if(gravityControlEnable){
+                    mouseManager.sendMovement((int)(sensorEvent.values[0]*-5)+"\t"+(int)(sensorEvent.values[1]*-5));
                 }
             }
             //复写onAccuracyChanged方法

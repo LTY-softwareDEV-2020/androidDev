@@ -180,7 +180,8 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="15dp"
         android:orientation="horizontal"
-        android:layout_gravity="center"><Button
+        android:layout_gravity="center">
+        <Button
         android:id="@+id/startGravityControl"
         android:background="@drawable/offline_files_button_shape"
         android:layout_gravity="center"
