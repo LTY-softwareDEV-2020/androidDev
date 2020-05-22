@@ -3,7 +3,7 @@
  */
 package offlinefiles;
 
-import com.lingdong20.MainActivity;
+import com.LightingShare.MainActivity;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
@@ -13,9 +13,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-/**
- * Created by 周博文 on 2016/7/24.
- */
+
 public class HttpThread_UpLoad extends Thread {
 
     public String uploadUrl;

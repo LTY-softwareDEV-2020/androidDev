@@ -19,7 +19,6 @@
             android:icon="@drawable/ic_menu_filesmanage"
             android:title="文件管理" />
         <item
-            android:visible="false"
             android:id="@+id/nav_feedback"
             android:icon="@drawable/ic_menu_feedback"
             android:title="用户反馈" />

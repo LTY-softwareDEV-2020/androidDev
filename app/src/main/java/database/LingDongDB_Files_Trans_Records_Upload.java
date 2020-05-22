@@ -7,9 +7,7 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-/**
- * Created by 周博文 on 2016/8/9.
- */
+
 public class LingDongDB_Files_Trans_Records_Upload extends Thread {
 
     public String url;

@@ -7,9 +7,7 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
-/**
- * Created by 周博文 on 2016/8/6.
- */
+
 public class LingDongDB extends SQLiteOpenHelper {
 
     /**

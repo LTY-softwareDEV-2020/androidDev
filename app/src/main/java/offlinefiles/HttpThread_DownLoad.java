@@ -5,7 +5,7 @@ package offlinefiles;
 
 import android.os.Environment;
 
-import com.lingdong20.MainActivity;
+import com.LightingShare.MainActivity;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -19,9 +19,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 
-/**
- * Created by 周博文 on 2016/7/24.
- */
+
 public class HttpThread_DownLoad extends Thread {
 
     String url;

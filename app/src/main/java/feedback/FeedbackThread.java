@@ -12,9 +12,7 @@ import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
 
-/**
- * Created by 周博文 on 2016/7/31.
- */
+
 public class FeedbackThread extends Thread {
 
     String url;

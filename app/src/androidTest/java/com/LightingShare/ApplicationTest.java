@@ -1,4 +1,4 @@
-package com.lingdong20;
+package com.LightingShare;
 
 import android.app.Application;
 import android.test.ApplicationTestCase;

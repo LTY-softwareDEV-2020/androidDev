@@ -2,7 +2,7 @@
  * 这是APP的MainActivity，当然，前面还有启动界面
  */
 
-package com.lingdong20;
+package com.LightingShare;
 
 import android.app.AlertDialog;
 import android.content.ContentValues;
@@ -25,7 +25,6 @@ import android.os.Handler;
 import android.os.Message;
 import android.provider.Settings;
 import android.support.v7.app.AppCompatActivity;
-import android.telephony.TelephonyManager;
 import android.text.format.Formatter;
 import android.util.DisplayMetrics;
 import android.util.Log;

@@ -9,13 +9,8 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
 
-import com.lingdong20.R;
+import com.LightingShare.R;
 
-import org.w3c.dom.Text;
-
-/**
- * Created by Administrator on 2016/8/17.
- */
 public class Files_Manage_Property extends Activity
 {
     @Override

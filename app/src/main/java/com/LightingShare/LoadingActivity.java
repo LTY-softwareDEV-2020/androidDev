@@ -1,7 +1,7 @@
 /**
  * APP启动界面
  */
-package com.lingdong20;
+package com.LightingShare;
 
 import android.app.Activity;
 import android.content.Intent;

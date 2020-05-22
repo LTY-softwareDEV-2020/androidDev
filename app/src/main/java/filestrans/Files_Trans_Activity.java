@@ -23,8 +23,8 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.lingdong20.MainActivity;
-import com.lingdong20.R;
+import com.LightingShare.MainActivity;
+import com.LightingShare.R;
 
 import org.json.JSONException;
 

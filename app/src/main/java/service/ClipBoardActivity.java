@@ -18,7 +18,7 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.TextView;
 
-import com.lingdong20.R;
+import com.LightingShare.R;
 
 import java.io.DataOutputStream;
 import java.io.IOException;

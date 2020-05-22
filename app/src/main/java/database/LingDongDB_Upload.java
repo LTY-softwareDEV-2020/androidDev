@@ -12,9 +12,6 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-/**
- * Created by 周博文 on 2016/8/8.
- */
 public class LingDongDB_Upload extends Thread {
 
     public String url;
