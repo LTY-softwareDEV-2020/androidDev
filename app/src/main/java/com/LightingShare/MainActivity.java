@@ -89,7 +89,7 @@ import filestrans.Files_Trans_Activity;
 import offlinefiles.HttpThread_DownLoad;
 import offlinefiles.HttpThread_UpLoad;
 import offlinefiles.Offline_Files_Choose_Activity;
-import database.LingDongDB;
+import database.LightnlingShare;
 
     public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
     public boolean UdpReceiveOut = true;//8秒后跳出udp接收线程
@@ -139,7 +139,7 @@ import database.LingDongDB;
     public static String IP_DuiFangde;
 
     /*********************************LingDongDB**************************************/
-    public static LingDongDB lingdongdb;  //声明本app的数据库
+    public static LightnlingShare lingdongdb;  //声明本app的数据库
     public static SQLiteDatabase dbWriter;
     public static String Device_ID = "";
 
@@ -543,7 +543,7 @@ import database.LingDongDB;
         int num = cursor.getInt(a);
         num++;//每点击一次就加一
         //将加一后的num存入数据库
-        String sql = "update " + LingDongDB.TABLE_User_Using_Modules_Times_Android + " set " + modules + " = " + num + " where _id = 1";
+        String sql = "update " + LightnlingShare.TABLE_User_Using_Modules_Times_Android + " set " + modules + " = " + num + " where _id = 1";
         System.out.println("0000000000000000000000000000000000000" + sql);
         dbWriter.execSQL(sql);
     }
@@ -853,7 +853,7 @@ import database.LingDongDB;
         rocketAnimation.start();*/
 
         /************************************************数据库相关操作***************************************/
-        lingdongdb = new LingDongDB(this);
+        lingdongdb = new LightnlingShare(this);
         dbWriter = lingdongdb.getWritableDatabase();
 
         //应该判断以下数据表是否为空，如果为空就插入一条，如果不为空就不执行操作，即不插入
@@ -893,7 +893,7 @@ import database.LingDongDB;
 
         /*******************************************/
         //设备之间连接的两个fab的定义以及初始化
-        fab_CreateConnection = (Button) findViewById(R.id.btnSend_offlinefiles);
+        fab_CreateConnection = (Button) findViewById(R.id.btnSend_offlinefiles);//这人，命名方式有点奇特，btnSend_offlinefiles下面还有个。。。
         fab_ScanToJoin = (Button) findViewById(R.id.btnDown_offlinefiles);
 
         multiple_actions = (FloatingActionsMenu) findViewById(R.id.multiple_actions);
@@ -972,7 +972,7 @@ import database.LingDongDB;
                         @Override
                         public void onClick(DialogInterface dialogInterface, int i) {
 
-                            update_User_Using_Modules_Times_Android(LingDongDB.Offline_Files_Download);
+                            update_User_Using_Modules_Times_Android(LightnlingShare.Offline_Files_Download);
 
                             EditText WenJianTiQuMa_Edit = (EditText) Dialogview.findViewById(R.id.WenJianTiQuMa_Edit);
                             String url = "http://115.28.101.196/AndroidDownloadAction.php";
@@ -1243,67 +1243,27 @@ import database.LingDongDB;
     /**************************************************************
      * 两个按钮的监听事件
      ***************************************************************/
-    private View.OnClickListener listener = new View.OnClickListener() {
+    private View.OnClickListener listener = new View.OnClickListener() {//简化
 
         @Override
         public void onClick(View v) {
-
-            if (v == fab_ScanToJoin) {
+            if (v == fab_ScanToJoin) {//加入连接按钮
                 tcpout = false;
                 update_wifi_flag=true;
-                update_User_Using_Modules_Times_Android(LingDongDB.Scan_To_Join);
+                showPopupWindow();//显示雷达扫描界面
+                fab_ScanToJoin.setVisibility(View.INVISIBLE);
+                fab_CreateConnection.setVisibility(View.INVISIBLE);//隐藏两个按钮
+                offline_trans_log.setText("正在发送UDP请求，若有连接将在此显示，若五秒钟后没有显示，可以点击再次搜索。。。" + "\n");
 
-                //显示雷达扫描界面
-                showPopupWindow();
-
-                //打开线程之前先判断热点是否是开的，如果热点是开的，就关掉热点，然后再开启wifi，如果热点本身是关的，就直接开启WIFI
-                /***************以下的判断方法是有错误的，应该重写***********/
-                if (WifiApAdmin.isWifiApEnabled(wifiManager)) {
-                    WifiApAdmin.closeWifiAp(wifiManager);
-                    wifiManager.setWifiEnabled(true);
-
-                    Thread thread = new Thread(new TcpReceive());
-                    thread.start();
-                    offline_trans_log.setText("正在发送UDP请求，若有连接将在此显示，若五秒钟后没有显示，可以点击再次搜索。。。" + "\n");
-                    BroadCastUdp bcu = new BroadCastUdp(address);
-                    bcu.start();
-                    fab_ScanToJoin.setEnabled(false);
-                    fab_CreateConnection.setEnabled(false);
-                } else {
-
-                    wifiManager.setWifiEnabled(true);
-
-                    Thread thread = new Thread(new TcpReceive());
-                    thread.start();
-                    offline_trans_log.setText("正在发送UDP请求，若有连接将在此显示，若五秒钟后没有显示，可以点击再次搜索。。。" + "\n");
-                    BroadCastUdp bcu = new BroadCastUdp(address);
-                    bcu.start();
-                    fab_ScanToJoin.setEnabled(false);
-                    fab_CreateConnection.setEnabled(false);
-                }
-            } else {
-
-                if (WifiApAdmin.isWifiApEnabled(wifiManager)) {
-                    WifiApAdmin.closeWifiAp(wifiManager);
-                    wifiManager.setWifiEnabled(true);
-                }
-
-                update_User_Using_Modules_Times_Android(LingDongDB.Create_Connection);
-                //显示雷达扫描界面
-                showPopupWindow();
-                //点击创建链接的按钮之后隐藏Fab.
-                fab_ScanToJoin.setEnabled(false);
-                fab_CreateConnection.setEnabled(false);
-
-
-
-                //设置"正在接受UDP请求，请求连接的设备将在此显示。。。"的提示
+                new Thread(new TcpReceive()).start();//TCP接受线程
+                new BroadCastUdp(address).start();//UDP广播线程
+            } else {//创建连接按钮
+                showPopupWindow();//显示雷达扫描界面
+                fab_ScanToJoin.setVisibility(View.INVISIBLE);
+                fab_CreateConnection.setVisibility(View.INVISIBLE);//隐藏两个按钮
                 offline_trans_log.setText("正在接收UDP请求，请求连接的设备将在此显示。。。");
-                //设置按钮不可点击
-                fab_CreateConnection.setEnabled(false);
-                /** 开启UDP接受线程*/
-                UdpReceive udpreceive = new UdpReceive();
-                udpreceive.start();
+
+                new UdpReceive().start();//UDP接受线程
             }
         }
     };
@@ -1339,8 +1299,6 @@ import database.LingDongDB;
             while (!(getConnectDeviceIP().length() > 6)) {
                 //上面getConnectDeviceIP().length() > 6 是用来判断getConnectDeviceIP()这个字符串是否获取了IP地址，不一定非要是6，其余合适的值都行
                 IP_DuiFangde = getConnectDeviceIP();
-
-
             }
 
             //当获取到IP后跳出上面的循环，将IP值赋值给变量
@@ -1359,7 +1317,8 @@ import database.LingDongDB;
                 // Toast.makeText(getApplicationContext(), "这不是一个IP，其值为："+IP_DuiFangde, Toast.LENGTH_LONG).show();
             }
             //恢复按钮为可点击
-            //设置按钮可点击}
+//            fab_ScanToJoin.setVisibility(View.VISIBLE);
+////            fab_CreateConnection.setVisibility(View.VISIBLE);
 
         }
 
@@ -1386,13 +1345,11 @@ import database.LingDongDB;
             while (!exit) {
                 DatagramPacket dataPacket = null;
                 try {
-
                     if(udpSocket==null){
                         udpSocket = new DatagramSocket(null);
                         udpSocket.setReuseAddress(true);
                         udpSocket.bind(new InetSocketAddress(DEFAULT_PORT));
                     }
-                   // udpSocket = new DatagramSocket(DEFAULT_PORT);
                     dataPacket = new DatagramPacket(buffer, MAX_DATA_PACKET_LENGTH);
                     byte[] data = dataString.getBytes();
                     dataPacket.setData(data);
@@ -1401,18 +1358,13 @@ import database.LingDongDB;
                     InetAddress broadcastAddr;
                     broadcastAddr = InetAddress.getByName("255.255.255.255");
                     dataPacket.setAddress(broadcastAddr);
-                } catch (Exception e) {
-                    Log.e(LOG_TAG, e.toString());
-                }
-                try {
                     udpSocket.send(dataPacket);
                     sleep(10);
+                    udpSocket.close();
                 } catch (Exception e) {
                     Log.e(LOG_TAG, e.toString());
                 }
-                udpSocket.close();
                 /**计算时间标志*/
-
                 long et = System.currentTimeMillis();
                 /**8秒后次线程自动销毁*/
                 if ((et - st) > 8000) {
@@ -1806,14 +1758,14 @@ import database.LingDongDB;
         int id = item.getItemId();
 
         if (id == R.id.nav_bluetooth) {
-            update_User_Using_Modules_Times_Android(LingDongDB.Bluetooth_Trans);
+            update_User_Using_Modules_Times_Android(LightnlingShare.Bluetooth_Trans);
             /**用系统的蓝牙模块来发送文件*/
             Intent intent = new Intent(getApplicationContext(), Offline_Files_Choose_Activity.class);
             intent.putExtra("Type", "bluetooth");
             startActivityForResult(intent, 0);
 
         } else if (id == R.id.nav_share) {
-            update_User_Using_Modules_Times_Android(LingDongDB.Share_APP);
+            update_User_Using_Modules_Times_Android(LightnlingShare.Share_APP);
 
             //弹出对话框，进行文件提取码的输入，然后下载文件
             AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
@@ -1829,7 +1781,7 @@ import database.LingDongDB;
 
 
         } else if (id == R.id.nav_connectPC) {
-            update_User_Using_Modules_Times_Android(LingDongDB.Connect_PC);
+            update_User_Using_Modules_Times_Android(LightnlingShare.Connect_PC);
             /**连接到电脑，与电脑进行文件互传*/
 
 //            Toast.makeText(MainActivity.this, "这不是一个标准IP，内容为：", Toast.LENGTH_LONG).show();
@@ -1869,7 +1821,7 @@ import database.LingDongDB;
 
 
         } else if (id == R.id.nav_filesmanage) {
-            update_User_Using_Modules_Times_Android(LingDongDB.Files_Manage);
+            update_User_Using_Modules_Times_Android(LightnlingShare.Files_Manage);
             /**菜单中文件管理选项，跳转到文件管理的Activity进行文件管理的操作*/
             Intent intent = new Intent(MainActivity.this, Files_Manage_Activity.class);
             startActivity(intent);
@@ -1885,7 +1837,7 @@ import database.LingDongDB;
             startActivity(intent);
 
         }*/ else if (id == R.id.nav_softversion) {
-            update_User_Using_Modules_Times_Android(LingDongDB.Software_Version);
+            update_User_Using_Modules_Times_Android(LightnlingShare.Software_Version);
             /**菜单中“版本”选项的弹出显示版本信息的对话框*/
             new AlertDialog.Builder(MainActivity.this)
                     .setTitle("软件版本")
@@ -1895,7 +1847,7 @@ import database.LingDongDB;
             return true;
 
         } else if (id == R.id.nav_softdescribe) {
-            update_User_Using_Modules_Times_Android(LingDongDB.Software_Describe);
+            update_User_Using_Modules_Times_Android(LightnlingShare.Software_Describe);
             /**菜单中“软件描述”选项的弹出对话框*/
             new AlertDialog.Builder(MainActivity.this)
                     .setTitle("软件描述")
@@ -1905,7 +1857,7 @@ import database.LingDongDB;
             return true;
 
         } else if (id == R.id.nav_aboutus) {
-            update_User_Using_Modules_Times_Android(LingDongDB.About_Us);
+            update_User_Using_Modules_Times_Android(LightnlingShare.About_Us);
             /**菜单中“关于我们”选项的弹出对话框*/
             new AlertDialog.Builder(MainActivity.this)
                     .setTitle("关于我们")
@@ -1915,7 +1867,7 @@ import database.LingDongDB;
             return true;
 
         } else if (id == R.id.nav_androidversion) {
-            update_User_Using_Modules_Times_Android(LingDongDB.User_Android_Version);
+            update_User_Using_Modules_Times_Android(LightnlingShare.User_Android_Version);
             /**菜单中“安卓版本”选项的弹出对话框*/
             new AlertDialog.Builder(MainActivity.this)
                     .setTitle("本机的安卓版本")

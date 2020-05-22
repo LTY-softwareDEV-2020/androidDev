@@ -14,7 +14,6 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:background="#BEBEBE">
-
         <TextView
             android:id="@+id/pathtext"
             android:layout_width="270dp"

@@ -8,7 +8,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 
-public class LingDongDB extends SQLiteOpenHelper {
+public class LightnlingShare extends SQLiteOpenHelper {
 
     /**
      * 以下是数据库相关的字段，以及表名等常量
@@ -70,7 +70,7 @@ public class LingDongDB extends SQLiteOpenHelper {
 
 
     //下面这个事构造函数
-    public LingDongDB(Context context) {
+    public LightnlingShare(Context context) {
         super(context, DATABASE_NAME, null, 1);
     }
 
