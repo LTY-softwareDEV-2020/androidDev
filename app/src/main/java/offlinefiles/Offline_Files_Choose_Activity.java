@@ -49,7 +49,6 @@ public class Offline_Files_Choose_Activity extends Activity {
         title.setText("选择要发送的文件");
         title.setTextSize(20);
 
-        //Toast.makeText(getApplicationContext(), "选择要发送的文件", Toast.LENGTH_SHORT).show();
         adapter = new FileAdapter(Offline_Files_Choose_Activity.this, R.layout.files_manage_listview_item, fileList);
         fileView = (ListView) findViewById(R.id.filelist);
         fileView.setAdapter(adapter);

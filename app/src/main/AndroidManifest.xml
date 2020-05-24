@@ -5,10 +5,13 @@
 
     <!--声明App的相关权限-->
     <uses-permission android:name="android.permission.INTERNET" /> <!--网络访问-->
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/> <!--SD卡写-->
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/> <!--SD卡读-->
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_MEDIA_STORAGE"
+        tools:ignore="ProtectedPermissions" />
     <uses-permission android:name="android.permission.MOUNT_UNMOUNT_FILESYSTEMS"
-        tools:ignore="ProtectedPermissions" /> <!-- 加载文件系统的权限 -->
+        tools:ignore="ProtectedPermissions" />
+
     <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" /><!-- 修改网络状态的权限 -->
     <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" /><!-- 修改wifi状态的权限 -->
     <uses-permission android:name="android.permission.CHANGE_WIFI_MULTICAST_STATE"/>
@@ -24,7 +27,6 @@
     <uses-permission android:name="android.permission.BLUETOOTH" /><!--允许程序连接到已配对的蓝牙设备-->
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" /><!--service中显示悬浮在桌面的窗口权限-->
     <uses-permission android:name="android.permission.GET_TASKS" />
-
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"

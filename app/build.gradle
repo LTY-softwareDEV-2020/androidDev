@@ -5,7 +5,7 @@ android {
     buildToolsVersion "29.0.3"
     defaultConfig {
         applicationId "com.lingdong20"
-        minSdkVersion 24
+        minSdkVersion 21
         targetSdkVersion 29
         versionCode 5
         versionName '2.1.0901.2146(beta)'
