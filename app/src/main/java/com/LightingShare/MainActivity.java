@@ -4,11 +4,14 @@
 
 package com.LightingShare;
 
+import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.drawable.ColorDrawable;
@@ -24,6 +27,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.provider.Settings;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.text.format.Formatter;
 import android.util.DisplayMetrics;
@@ -144,11 +148,32 @@ import database.LightnlingShare;
     public static String Device_ID = "";
 
     /********************************************************************************/
+    private static final int REQUEST_EXTERNAL_STORAGE = 1;
+        private static String[] PERMISSIONS_STORAGE = {
+                "android.permission.READ_EXTERNAL_STORAGE",
+                "android.permission.WRITE_EXTERNAL_STORAGE" };
 
+
+        public static void verifyStoragePermissions(Activity activity) {
+
+            try {
+                //检测是否有写的权限
+                int permission = ActivityCompat.checkSelfPermission(activity,
+                        "android.permission.WRITE_EXTERNAL_STORAGE");
+                if (permission != PackageManager.PERMISSION_GRANTED) {
+                    // 没有写的权限，去申请写的权限，会弹出对话框
+                    ActivityCompat.requestPermissions(activity, PERMISSIONS_STORAGE,REQUEST_EXTERNAL_STORAGE);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
     /**
      * 声明Handler用来接收并处理子线程的消息并更新UI界面
      */
+    @SuppressLint("HandlerLeak")
     public static Handler handler = new Handler() {
+        @SuppressLint("HandlerLeak")
         private int process = 0;//用作离线上传下载的进度条，但是还没加
 
         @Override
@@ -190,6 +215,7 @@ import database.LightnlingShare;
     /**
      * handler用于子线程更新
      */
+    @SuppressLint("HandlerLeak")
     private Handler handler1 = new Handler() {
         @Override
         public void handleMessage(Message msg) {
@@ -249,28 +275,11 @@ import database.LightnlingShare;
     };
 
 
-    /**
-     * Android6.0 获取更改系统设置的权限，app用了其他的方式，这段代码没有用到，删除也可以的
-     */
-    private void getPermission() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            // 判断是否有WRITE_SETTINGS权限
-            if (!Settings.System.canWrite(this)) {
-                // 申请WRITE_SETTINGS权限
-                Intent intent = new Intent(Settings.ACTION_MANAGE_WRITE_SETTINGS,
-                        Uri.parse("package:" + getPackageName()));
-                startActivityForResult(intent, 0);
-            }
-        }
-    }
-
-
     /**获取连接到手机热点设备的IP*/
     StringBuilder resultList;
     ArrayList<String> connectedIP;
 
     public String getConnectDeviceIP() {
-
         try {
             connectedIP = getConnectIp();
         } catch (Exception e1) {
@@ -343,7 +352,9 @@ import database.LightnlingShare;
     }
 
 
+    @SuppressLint("HandlerLeak")
     private Handler handler2 = new Handler() {
+        @SuppressLint("HandlerLeak")
         @Override
         public void handleMessage(Message msg) {
             switch (msg.what) {
@@ -369,9 +380,7 @@ import database.LightnlingShare;
                 default:
                     tcpout = true;
                     offline_trans_log.append("查找到可用设备，其IP为：" + msg.obj + "\n");
-
                     System.out.println("00000000000000000000000000000000000000000000000000000000000000000000000" + msg.obj);
-
                     if (isIp((String) (msg.obj))) {
                         Toast.makeText(MainActivity.this, "这是一个IP，地址为：" + (msg.obj), Toast.LENGTH_LONG).show();
 
@@ -392,6 +401,7 @@ import database.LightnlingShare;
 
 
     /***************************************************************************************************************/
+    @SuppressLint("HandlerLeak")
     private Handler handler4 = new Handler() {
         @Override
         public void handleMessage(Message msg) {
@@ -575,28 +585,14 @@ import database.LightnlingShare;
      * 获取设备唯一的标志码
      */
     public String getDeviceID() {
-        return "10534";
+        return "1145114";
     }
 
     public String getAndroidVersion() {
-        String AndroidVersion = android.os.Build.VERSION.RELEASE;
-        return AndroidVersion;
+        return android.os.Build.VERSION.RELEASE;
     }
 
     public String getCpuName() {
-        try {
-            FileReader fr = new FileReader("/proc/cpuinfo");
-            BufferedReader br = new BufferedReader(fr);
-            String text = br.readLine();
-            String[] array = text.split(":\\s+", 2);
-            for (int i = 0; i < array.length; i++) {
-            }
-            return array[1];
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
         return null;
     }
 
@@ -604,36 +600,14 @@ import database.LightnlingShare;
      * 获取安卓手机RAM
      */
     public String getTotalMemory() {
-        String str1 = "/proc/meminfo";// 系统内存信息文件
-        String str2;
-        String[] arrayOfString;
-        long initial_memory = 0;
-        try {
-            FileReader localFileReader = new FileReader(str1);
-            BufferedReader localBufferedReader = new BufferedReader(localFileReader, 8192);
-            str2 = localBufferedReader.readLine();// 读取meminfo第一行，系统总内存大小
-
-            arrayOfString = str2.split("\\s+");
-            for (String num : arrayOfString) {
-                Log.i(str2, num + "\t");
-            }
-
-            initial_memory = Integer.valueOf(arrayOfString[1]).intValue() * 1024;// 获得系统总内存，单位是KB，乘以1024转换为Byte
-            localBufferedReader.close();
-
-        } catch (IOException e) {
-        }
-        return Formatter.formatFileSize(getBaseContext(), initial_memory);// Byte转换为KB或者MB，内存大小规格化
+        return "12GB";
     }
 
     /**
      * 获取屏幕分辨率
      **/
     public String getScreenResolution() {
-        DisplayMetrics dm = new DisplayMetrics();
-        getWindowManager().getDefaultDisplay().getMetrics(dm);
-        String strOpt = dm.widthPixels + " * " + dm.heightPixels;
-        return strOpt;
+        return "1920*1080";
     }
 
     /**
@@ -711,11 +685,6 @@ import database.LightnlingShare;
     }
 
     /**这里写的是将数据表 User_Using_Files_Trans_Android 读取出来转换为Json格式的方法,返回的参数为 JSONObject ,这里面可能会有多条数据，因而与上面会有不同*/
-    /**
-     * 唉~~~  算了 想用一个通用方法搞定的，看来这个这个不行，将其设定为  读取一条数据 上传 再读取下一条 数据 上传 ，而不是一次读取所有，然后一次性上传
-     * 这个方法暂时写的有点问题，先搞定其他的表格再说吧
-     * 方法已经重写 没有问题了
-     **/
     public static void get_User_Using_Files_Trans_Android() throws JSONException {
         //查询获得游标
         Cursor cursor = dbWriter.query(lingdongdb.TABLE_User_Using_Files_Trans_Android, null, null, null, null, null, null);
@@ -739,43 +708,7 @@ import database.LightnlingShare;
 
         //清空User_Using_Files_Trans_Android数据表
         dbWriter.execSQL("DELETE FROM user_using_files_trans_android");
-        //自增长ID设置为0
-        //dbWriter.execSQL("DELETE FROM sqlite_sequence");
 
-       /* //将游标移动到第一行，游标就是指针
-        if ((cursor != null) && cursor.moveToFirst()){
-            String ddd = "http://192.168.1.147/OfflineTrans/DatabaseScript/User_Using_Files_Trans_Android.php";
-
-            do {
-
-                user_info_android.put("_id",cursor.getInt(0));           //获取第一列的值
-                user_info_android.put("device_id",cursor.getString(1));  //获取第二列的值
-                user_info_android.put("files_name",cursor.getString(2)); //获取第三列的值
-                user_info_android.put("files_type",cursor.getString(3));
-                user_info_android.put("files_size",cursor.getString(4));
-                user_info_android.put("trans_time",cursor.getString(5));
-
-                System.out.println(user_info_android.toString());
-
-                new LingDongDB_Upload(ddd,user_info_android).start();
-
-                //new LingDongDB_Files_Trans_Records_Upload(ddd,user_info_android);
-
-                System.out.println("线程启动成功---------------------------------------------------------------成功");
-
-                //sb.append(user_info_android);
-                //sb.append(",");
-
-            }while (cursor.moveToNext());
-
-            //sb.deleteCharAt(sb.length()-1);
-
-            //String weiba = "]}";
-            //sb.append(weiba);
-            //在logcat输出这个值用以检查验证
-            //System.out.println(sb.toString());
-
-        }*/
 
     }
     /**
@@ -798,37 +731,17 @@ import database.LightnlingShare;
         } catch (JSONException e) {
             e.printStackTrace();
         }
-
-        /*try {
-            String ddd = "http://192.168.1.147/OfflineTrans/DatabaseScript/User_Using_Files_Trans_Android.php";
-            //要首先判断这个数据表是不是为空，即当没有进行文件传输的时候，这个表应该是空的，如果这个时候仍然执行，那么应用就会闪退
-            Cursor cursor = dbWriter.query(lingdongdb.TABLE_User_Using_Files_Trans_Android,null,null,null,null,null,null);
-            cursor.getCount();
-            if (cursor.getCount() > 0){
-                get_User_Using_Files_Trans_Android();
-
-            }
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }*/
-
-
         try {
-            //String bbb = "http://192.168.1.147/OfflineTrans/DatabaseScript/User_Using_Time_Android.php";
             String bbb = "http://115.28.101.196/DatabaseScript/User_Using_Time_Android.php";
             new LingDongDB_Upload(bbb, get_User_Using_Time_Android()).start();
-            //get_User_Using_Time_Android();
-
         } catch (JSONException e) {
             e.printStackTrace();
         }
 
 
         try {
-            //String ccc = "http://192.168.1.147/OfflineTrans/DatabaseScript/User_Using_Modules_Times_Android.php";
             String ccc = "http://115.28.101.196/DatabaseScript/User_Using_Modules_Times_Android.php";
             new LingDongDB_Upload(ccc, get_User_Using_Modules_Times_Android()).start();
-            //get_User_Using_Modules_Times_Android();
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -843,14 +756,7 @@ import database.LightnlingShare;
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        /****************************app的背景 逐帧动画**************************************/
-        /*ImageView rocketImage = (ImageView) findViewById(R.id.iv);
-        rocketImage.setBackgroundResource(R.drawable.my_anim);
-
-        AnimationDrawable rocketAnimation = (AnimationDrawable) rocketImage.getBackground();
-
-        rocketAnimation.start();*/
+        verifyStoragePermissions(this);
 
         /************************************************数据库相关操作***************************************/
         lingdongdb = new LightnlingShare(this);
@@ -882,20 +788,14 @@ import database.LightnlingShare;
 
         /********************************************************数据库相关操作*********************************/
 
-        //android 6.0更改系统设置的权限
-        //getPermission();
-
         /*****************************************************/
-
         wifiManager = (WifiManager) super.getSystemService(Context.WIFI_SERVICE);
         /*****************************************************/
-
 
         /*******************************************/
         //设备之间连接的两个fab的定义以及初始化
         fab_CreateConnection = (Button) findViewById(R.id.btnSend_offlinefiles);//这人，命名方式有点奇特，btnSend_offlinefiles下面还有个。。。
         fab_ScanToJoin = (Button) findViewById(R.id.btnDown_offlinefiles);
-
         multiple_actions = (FloatingActionsMenu) findViewById(R.id.multiple_actions);
         rl_root = (DrawerLayout) findViewById(R.id.drawer_layout);
         //初始化wifiAdmin
@@ -908,16 +808,12 @@ import database.LightnlingShare;
         /**点击跳转到开启接受UDP请求界面*/
         fab_CreateConnection.setOnClickListener(listener);
 
-
         /*******************************************/
         adapter = new ArrayAdapter<String>(MainActivity.this, android.R.layout.simple_expandable_list_item_1, arraylist);//初始化adapter
-
-
         /******************************************/
         //显示离线文件传输的日志提醒的Textview，offline_trans_log,这个Textview同时也作为fab连接设备时候的文本提醒
         offline_trans_log = (TextView) findViewById(R.id.offline_trans_log);
         /*****************************************/
-
         //控件初始化，设置监听事件
         btnSend_offlinefiles = (com.getbase.floatingactionbutton.FloatingActionButton) findViewById(R.id.fab_CreateConnection);
         btnSend_offlinefiles.setOnClickListener(new View.OnClickListener() {
@@ -945,12 +841,7 @@ import database.LightnlingShare;
         btnDown_offlinefiles.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
                 /**************************************************************************************************************************/
-
-
-                /**************************************************************************************************************************/
-
                 /**用于获取网络状态的代码*/
                 ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
                 NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
@@ -971,9 +862,7 @@ import database.LightnlingShare;
                     builder.setPositiveButton("下载", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialogInterface, int i) {
-
                             update_User_Using_Modules_Times_Android(LightnlingShare.Offline_Files_Download);
-
                             EditText WenJianTiQuMa_Edit = (EditText) Dialogview.findViewById(R.id.WenJianTiQuMa_Edit);
                             String url = "http://115.28.101.196/AndroidDownloadAction.php";
                             //String DownLoadNumber = "52124";
@@ -981,52 +870,28 @@ import database.LightnlingShare;
                             new HttpThread_DownLoad(url, DownLoadNumber).start();//启动文件下载的线程
                         }
                     });
-
-                    //设置点击取消后的事件
+               //设置点击取消后的事件
                     builder.setNegativeButton("取消", null);
                     builder.show();
                 }
             }
         });
 
-
         /**当点开程序的时候，在SDcard目录下面新建一个名为LingDong的文件夹用以存放程序接收到的文件*/
         createMkdir(LingDongRootFolder);
-
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         /**谷歌自带Fab的设置，将其注释掉是因为我们使用的是第三方的库*/
-        /*FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });*/
-
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.setDrawerListener(toggle);
         toggle.syncState();
-
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
 
     }
-
-
-
-
-
-//                    LinearLayout relativeLayout = (LinearLayout) findViewById(R.id.linearlayout);
-//                    Resources resources = getBaseContext().getResources();
-//                    Drawable btnDrawable = resources.getDrawable(R.drawable.offline_files_main_background_change1);
-//                    relativeLayout.setBackgroundDrawable(btnDrawable);
-
 
     //type 0新建wifi列表
     //type 1动态更新wifi列表
@@ -1034,18 +899,13 @@ import database.LightnlingShare;
         wifiAdmin.startScan();
         wifiAdmin.lookUpScan();
         arraylist.clear();
-
         for (ScanResult e : wifiAdmin.getWifiList()) {
-
             Log.i("TAG", "4444444444444444444555555555555555555");
-            //  arraylist.add(e.SSID);
-//            !arraylist.contains(e.SSID)
+
             if (e.SSID.equals("LingDong"))//如果热点名有LingDong且不为空且不重复
             {
                 //关闭wifi列表更新
                 update_wifi_flag = false;
-//                Log.i("TAG","SSID:"+e.SSID );
-
                 //这一段输入密码，现阶段设置为默认123456789
                 CreatConnection("LingDong", "123456789", 3);//这里输入密码
                 //更新这个IP地址
@@ -1072,31 +932,6 @@ import database.LightnlingShare;
         }
 
     }
-//        if(type == 0)
-//        {
-//            listView.setAdapter(adapter);
-//            listView.setOnItemClickListener(new AdapterView.OnItemClickListener()
-//            {
-//                @Override
-//                public void onItemClick(AdapterView<?> parent, View view, int position, long id)
-//                {
-//                    //关闭wifi列表更新
-//                    update_wifi_flag = false;
-//                    //这一段输入密码，现阶段设置为默认123456789
-//                    CreatConnection(arraylist.get(position), "123456789", 3);//这里输入密码
-//                    //当点击特定的WIFI后，即连接上对方所开的热点后，应该跳转到文件发送与接收的界面，同时还应该获取对方的IP，也就是Android开热点时，手机的一个固定的IP 192.168.43.1
-//                    //更新这个IP地址
-//                    IP_DuiFangde = "192.168.43.1";
-//                    //设置点击后跳转到文件发送与接收界面，还要有一个判断，判断点击的是不是LingDong热点，这里暂时就不判断了，后期会更改为只显示LingDong这个热点
-//                    Intent intent_filetrans=new Intent(MainActivity.this, Files_Trans_Activity.class);
-//                    startActivity(intent_filetrans);
-//                }
-//            });
-//        }
-//        else
-//            adapter.notifyDataSetChanged();
-//    }
-
     void CreatConnection(final String name, final String key, final int type) {
         new Thread(new Runnable()//匿名内部类的调用方式
         {
@@ -1112,9 +947,7 @@ import database.LightnlingShare;
                 wifiFlag = false;//关闭扫描wifi热点的子线程
             }
         }).start();// 建立链接线程
-
     }
-
     public String GetIpAddress() {
         WifiManager wifiManager = (WifiManager) getSystemService(WIFI_SERVICE);
         WifiInfo wifiInfo = wifiManager.getConnectionInfo();
@@ -1251,18 +1084,16 @@ import database.LightnlingShare;
                 tcpout = false;
                 update_wifi_flag=true;
                 showPopupWindow();//显示雷达扫描界面
-                fab_ScanToJoin.setVisibility(View.INVISIBLE);
-                fab_CreateConnection.setVisibility(View.INVISIBLE);//隐藏两个按钮
+//                fab_ScanToJoin.setVisibility(View.INVISIBLE);
+//                fab_CreateConnection.setVisibility(View.INVISIBLE);//隐藏两个按钮
                 offline_trans_log.setText("正在发送UDP请求，若有连接将在此显示，若五秒钟后没有显示，可以点击再次搜索。。。" + "\n");
-
                 new Thread(new TcpReceive()).start();//TCP接受线程
                 new BroadCastUdp(address).start();//UDP广播线程
             } else {//创建连接按钮
                 showPopupWindow();//显示雷达扫描界面
-                fab_ScanToJoin.setVisibility(View.INVISIBLE);
-                fab_CreateConnection.setVisibility(View.INVISIBLE);//隐藏两个按钮
+//                fab_ScanToJoin.setVisibility(View.INVISIBLE);
+//                fab_CreateConnection.setVisibility(View.INVISIBLE);//隐藏两个按钮
                 offline_trans_log.setText("正在接收UDP请求，请求连接的设备将在此显示。。。");
-
                 new UdpReceive().start();//UDP接受线程
             }
         }
@@ -1380,12 +1211,8 @@ import database.LightnlingShare;
             }
             Log.i("tag", "show");
             if (show) {
-                //tcpout = true;
-                //Message message = new Message();
                 show = false;
-                //不再进行UDP发送与接收后，扫描并显示WIFI列表
                 handler2.sendEmptyMessage(7);
-                // handler.sendMessage(message);
                 new Thread(new Runnable()//同时开启一个动态更新wifi列表的线程，直到标志位update_wifi_flag被赋值false
                 {
                     @Override
@@ -1621,19 +1448,6 @@ import database.LightnlingShare;
         return b;
     }
 
-    /**
-     * 去除字符串前后的空格
-     */
-    public String deleteSpace(String IP) {//去掉IP字符串前后所有的空格
-        while (IP.startsWith(" ")) {
-            IP = IP.substring(1, IP.length()).trim();
-        }
-        while (IP.endsWith(" ")) {
-            IP = IP.substring(0, IP.length() - 1).trim();
-        }
-        return IP;
-    }
-
 
     /**
      * 重写onActivityResult()方法，获取选取要上传文件的文件路径
@@ -1696,20 +1510,6 @@ import database.LightnlingShare;
             if ((System.currentTimeMillis() - mExitTime) > 2000) {
                 Toast.makeText(this, "再按一次退出程序", Toast.LENGTH_SHORT).show();
                 mExitTime = System.currentTimeMillis();
-
-//                {
-//                    //退出时上传用户使用过程中产生的数据，先判断有无网络，如果有网络就上传，无网络就丢弃本次数据，每次上传成功后，清空所有数据表
-//                    //退出时 上传用户产生的数据，这里没有判断网络状况，直接上传的，如果此时网络无法连接，则放弃此条数据，不作为大数据样本统计到数据分析中
-//                    update_LingDongDB();
-//                    //清空所有数据表
-//                    dbWriter.execSQL("DELETE FROM user_info_android");
-//                    dbWriter.execSQL("DELETE FROM user_using_time_android");
-//                    dbWriter.execSQL("DELETE FROM user_using_modules_times_android");
-//                    dbWriter.execSQL("DELETE FROM user_using_files_trans_android");
-//                    //自增长ID设置为0
-//                    dbWriter.execSQL("DELETE FROM sqlite_sequence");
-//                }
-
             } else {
 
                 finish();
@@ -1784,42 +1584,16 @@ import database.LightnlingShare;
             update_User_Using_Modules_Times_Android(LightnlingShare.Connect_PC);
             /**连接到电脑，与电脑进行文件互传*/
 
-//            Toast.makeText(MainActivity.this, "这不是一个标准IP，内容为：", Toast.LENGTH_LONG).show();
-//            Log.i("TAG", "55555555555555555555555555555");
-//            Intent intent = new Intent(MainActivity.this, Files_Trans_Activity.class);
-//            startActivity(intent);
-
-
                 //显示雷达扫描界面
                 showPopupWindow();
-
                 //打开线程之前先判断热点是否是开的，如果热点是开的，就关掉热点，然后再开启wifi，如果热点本身是关的，就直接开启WIFI
                 /***************以下的判断方法是有错误的，应该重写***********/
-//                if (WifiApAdmin.isWifiApEnabled(wifiManager)) {
-//                    WifiApAdmin.closeWifiAp(wifiManager);
-//                    wifiManager.setWifiEnabled(true);
-
                     Thread thread = new Thread(new TcpReceive2());
                     thread.start();
                     offline_trans_log.setText("正在发送UDP请求，若有连接将在此显示，若五秒钟后没有显示，可以点击再次搜索。。。" + "\n");
-                    BroadCastUdp1 bcu = new BroadCastUdp1(address);
-                    bcu.start();
+                    new BroadCastUdp1(address).start();
                     fab_ScanToJoin.setEnabled(false);
                     fab_CreateConnection.setEnabled(false);
-//                } else {
-//
-//                    wifiManager.setWifiEnabled(true);
-//
-//                    Thread thread = new Thread(new TcpReceive());
-//                    thread.start();
-//                    offline_trans_log.setText("正在发送UDP请求，若有连接将在此显示，若五秒钟后没有显示，可以点击再次搜索。。。" + "\n");
-//                    BroadCastUdp bcu = new BroadCastUdp(address);
-//                    bcu.start();
-//                    fab_ScanToJoin.setEnabled(false);
-//                    fab_CreateConnection.setEnabled(false);
-//                }
-
-
         } else if (id == R.id.nav_filesmanage) {
             update_User_Using_Modules_Times_Android(LightnlingShare.Files_Manage);
             /**菜单中文件管理选项，跳转到文件管理的Activity进行文件管理的操作*/
@@ -1835,7 +1609,6 @@ import database.LightnlingShare;
             *//**菜单中文件管理选项，跳转到文本剪贴操作*//*
             Intent intent = new Intent(MainActivity.this, ClipBoardActivity.class);
             startActivity(intent);
-
         }*/ else if (id == R.id.nav_softversion) {
             update_User_Using_Modules_Times_Android(LightnlingShare.Software_Version);
             /**菜单中“版本”选项的弹出显示版本信息的对话框*/

@@ -129,7 +129,7 @@ public class Files_Manage_Activity extends AppCompatActivity {
         adapter = new FileAdapter(Files_Manage_Activity.this, R.layout.files_manage_listview_item, fileList);
         listView = (ListView) findViewById(R.id.filelist);
         listView.setAdapter(adapter);
-        UpdateFile(Environment.getExternalStorageDirectory().getPath());
+        UpdateFile(Environment.getExternalStorageDirectory().getAbsolutePath());
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener()//点击监听事件
         {
             @Override
@@ -268,11 +268,13 @@ public class Files_Manage_Activity extends AppCompatActivity {
 
     //扫描某路径下所有文件及文件夹
     private void UpdateFile(String path) {
+//        Toast.makeText(Files_Manage_Activity.this, "路径为"+path, Toast.LENGTH_SHORT).show();
         pathText.setText(path);
         fileList.clear();//清空fileList
         File selectfile = new File(path);
         if (path.equals(Environment.getExternalStorageDirectory().getPath()) == false)
             fileList.add(new FileClass("返回上一层", selectfile.getParentFile().getPath(), R.drawable.back));
+        Toast.makeText(Files_Manage_Activity.this, "boolean="+selectfile.canRead(), Toast.LENGTH_SHORT).show();
         if (selectfile.exists() && selectfile.canRead()) {
             List<File> files = Arrays.asList(new File(path).listFiles());
             Collections.sort(files, new Comparator<File>() {
@@ -296,7 +298,8 @@ public class Files_Manage_Activity extends AppCompatActivity {
                     fileList.add(new FileClass(file.getName(), file.getPath(), R.drawable.file));
                 }
             }
-        } else Toast.makeText(Files_Manage_Activity.this, "无权限访问！", Toast.LENGTH_SHORT).show();
+        }
+        else Toast.makeText(Files_Manage_Activity.this, "无权限访问_1！", Toast.LENGTH_SHORT).show();
         adapter.notifyDataSetChanged();
     }
 
