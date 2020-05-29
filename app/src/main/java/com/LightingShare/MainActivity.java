@@ -977,19 +977,16 @@ import database.LightnlingShare;
      */
     private class TcpReceive implements Runnable {
         public void run() {
-
             while (true) {
                 tcpout = false;
                 Socket socket = null;
                 ServerSocket ss = null;
                 BufferedReader in = null;
                 try {
-                    new BroadCastUdp("TCP等待","192.168.1.3").start();
                     Log.i("TcpReceive", "ServerSocket +++++++");
                     ss = new ServerSocket(8080);
                     socket = ss.accept();
                     Log.i("TcpReceive", "connect +++++++");
-                    new BroadCastUdp("TCP连上了","192.168.1.3").start();
                     if (socket != null) {
                         run = true;
                         a = true;
@@ -1032,7 +1029,9 @@ import database.LightnlingShare;
     }
 
 
-    /**
+
+
+        /**
      * 接受返回的TCP消息
      */
     private class TcpReceive2 implements Runnable {
@@ -1102,35 +1101,60 @@ import database.LightnlingShare;
 
         @Override
         public void onClick(View v) {
-            if (v == fab_ScanToJoin) {//加入连接按钮
+            if (v == fab_ScanToJoin) {
                 tcpout = false;
                 update_wifi_flag=true;
-                showPopupWindow();//显示雷达扫描界面
-//                fab_ScanToJoin.setVisibility(View.INVISIBLE);
-//                fab_CreateConnection.setVisibility(View.INVISIBLE);//隐藏两个按钮
-                offline_trans_log.setText("正在发送UDP请求，若有连接将在此显示，若五秒钟后没有显示，可以点击再次搜索。。。" + "\n");
-                new Thread(new TcpReceive()).start();//TCP接受线程
-//                new BroadCastUdp(address).start();//UDP广播线程
-//                new BroadCastUdp().start();//UDP广播线程
-                for(String devIp : new String[]{
-                        "192.168.1.3",
-                        "192.168.1.4",
-                        "192.168.1.5",
-                        "192.168.1.6"
-                }){
-                    if(!devIp.equals(GetIpAddress())){
-                        new BroadCastUdp(address,devIp).start();
-                    }
+
+                //显示雷达扫描界面
+                showPopupWindow();
+
+                //打开线程之前先判断热点是否是开的，如果热点是开的，就关掉热点，然后再开启wifi，如果热点本身是关的，就直接开启WIFI
+                /***************以下的判断方法是有错误的，应该重写***********/
+                if (WifiApAdmin.isWifiApEnabled(wifiManager)) {
+                    WifiApAdmin.closeWifiAp(wifiManager);
+                    wifiManager.setWifiEnabled(true);
+
+                    Thread thread = new Thread(new TcpReceive());
+                    thread.start();
+                    offline_trans_log.setText("正在发送UDP请求，若有连接将在此显示，若五秒钟后没有显示，可以点击再次搜索。。。" + "\n");
+                    BroadCastUdp bcu = new BroadCastUdp(address);
+                    bcu.start();
+                    fab_ScanToJoin.setEnabled(false);
+                    fab_CreateConnection.setEnabled(false);
+                } else {
+
+                    wifiManager.setWifiEnabled(true);
+
+                    Thread thread = new Thread(new TcpReceive());
+                    thread.start();
+                    offline_trans_log.setText("正在发送UDP请求，若有连接将在此显示，若五秒钟后没有显示，可以点击再次搜索。。。" + "\n");
+                    BroadCastUdp bcu = new BroadCastUdp(address);
+                    bcu.start();
+                    fab_ScanToJoin.setEnabled(false);
+                    fab_CreateConnection.setEnabled(false);
                 }
-            } else {//创建连接按钮
-                showPopupWindow();//显示雷达扫描界面
-//                fab_ScanToJoin.setVisibility(View.INVISIBLE);
-//                fab_CreateConnection.setVisibility(View.INVISIBLE);//隐藏两个按钮
+            } else {
+
+                if (WifiApAdmin.isWifiApEnabled(wifiManager)) {
+                    WifiApAdmin.closeWifiAp(wifiManager);
+                    wifiManager.setWifiEnabled(true);
+                }
+
+                //显示雷达扫描界面
+                showPopupWindow();
+                //点击创建链接的按钮之后隐藏Fab.
+                fab_ScanToJoin.setEnabled(false);
+                fab_CreateConnection.setEnabled(false);
+
+
+
+                //设置"正在接受UDP请求，请求连接的设备将在此显示。。。"的提示
                 offline_trans_log.setText("正在接收UDP请求，请求连接的设备将在此显示。。。");
-                new UdpReceive().start();//UDP接受线程
-                /**********************
-                 开启一个UDP线程去监听广播，
-                 *********************/
+                //设置按钮不可点击
+                fab_CreateConnection.setEnabled(false);
+                /** 开启UDP接受线程*/
+                UdpReceive udpreceive = new UdpReceive();
+                udpreceive.start();
             }
         }
     };
@@ -1198,14 +1222,12 @@ import database.LightnlingShare;
         private String dataString;
         private DatagramSocket udpSocket;
         public volatile boolean exit = false;
-        public String targetIP = "255.255.255.255";
+
         public BroadCastUdp(String dataString) {
             this.dataString = dataString;
         }
-        public BroadCastUdp(String dataString,String targetIP) {
-            this.dataString = dataString;
-            this.targetIP = targetIP;
-        }
+
+
         public void run() {
 
             show = false;
@@ -1214,26 +1236,33 @@ import database.LightnlingShare;
             while (!exit) {
                 DatagramPacket dataPacket = null;
                 try {
+
                     if(udpSocket==null){
                         udpSocket = new DatagramSocket(null);
                         udpSocket.setReuseAddress(true);
                         udpSocket.bind(new InetSocketAddress(DEFAULT_PORT));
                     }
+                    // udpSocket = new DatagramSocket(DEFAULT_PORT);
                     dataPacket = new DatagramPacket(buffer, MAX_DATA_PACKET_LENGTH);
                     byte[] data = dataString.getBytes();
                     dataPacket.setData(data);
                     dataPacket.setLength(data.length);
                     dataPacket.setPort(DEFAULT_PORT);
                     InetAddress broadcastAddr;
-                    broadcastAddr = InetAddress.getByName(targetIP);
+                    broadcastAddr = InetAddress.getByName("255.255.255.255");
                     dataPacket.setAddress(broadcastAddr);
-                    udpSocket.send(dataPacket);
-                    sleep(1);
-                    udpSocket.close();
                 } catch (Exception e) {
                     Log.e(LOG_TAG, e.toString());
                 }
+                try {
+                    udpSocket.send(dataPacket);
+                    sleep(10);
+                } catch (Exception e) {
+                    Log.e(LOG_TAG, e.toString());
+                }
+                udpSocket.close();
                 /**计算时间标志*/
+
                 long et = System.currentTimeMillis();
                 /**8秒后次线程自动销毁*/
                 if ((et - st) > 8000) {
@@ -1249,8 +1278,12 @@ import database.LightnlingShare;
             }
             Log.i("tag", "show");
             if (show) {
+                //tcpout = true;
+                //Message message = new Message();
                 show = false;
+                //不再进行UDP发送与接收后，扫描并显示WIFI列表
                 handler2.sendEmptyMessage(7);
+                // handler.sendMessage(message);
                 new Thread(new Runnable()//同时开启一个动态更新wifi列表的线程，直到标志位update_wifi_flag被赋值false
                 {
                     @Override
@@ -1280,7 +1313,6 @@ import database.LightnlingShare;
 
         }
     }
-
 
     /****************************************************************************************************/
     public class BroadCastUdp1 extends Thread {
@@ -1384,42 +1416,79 @@ import database.LightnlingShare;
      */
     public class UdpReceive extends Thread {
         public void run() {
-            /**8秒后发送消息更新UI*/
-//            handler1.sendEmptyMessageDelayed(3, 7500);
-//            handler1.sendEmptyMessageDelayed(2, 8000);//8秒后执行case2 也就是自动开启WIFI热点
             udpout = false;   //判断是否退出UDP接收线程的标志位
             byte[] data = new byte[256];
             try {
-                lock.acquire();
                 udpSocket = new DatagramSocket(43708);
                 udpPacket = new DatagramPacket(data, data.length);
-                udpSocket.receive(udpPacket);
-                if (null != udpPacket.getAddress()){
+            } catch (SocketException e1) {
+                e1.printStackTrace();
+            }
+
+
+            /**8秒后发送消息更新UI*/
+            handler1.sendEmptyMessageDelayed(3, 7500);
+            handler1.sendEmptyMessageDelayed(2, 8000);//8秒后执行case2 也就是自动开启WIFI热点
+            while (true) {
+                Log.i("tag", "8888888888888888888888888888888888888888888888888888");
+
+
+                try {
+                    Log.i("tag", "8888888888888888888888888888888888888888888888888888");
+                    udpSocket.receive(udpPacket);
+                } catch (IOException e) {
+                    Log.i("tag", "8888888888888888888888888888888888888888888888888888");
+                    e.printStackTrace();
+                }
+
+                if (null != udpPacket.getAddress()) {
+                    Log.i("tag", "9999999999999999999999999999999999999999999999999");
                     final String quest_ip = udpPacket.getAddress().toString();
                     Message msg = new Message();
+                    msg.obj = quest_ip;
+                    //quest_ip前面会有一个/符号，例如/192.168.0.1，这里对他进行截取，截取后就为真正的IP地址 如 192.168.0.1
                     msg.obj = quest_ip.substring(1);
                     handler1.sendMessage(msg);//msg中包含了IP地址
-                    final String ip = udpPacket.getAddress().toString().substring(1);
-                    handler1.sendEmptyMessage(1);
-                    socket = new Socket(ip, 8080);
-                    socket.getOutputStream().write(123465);
-                    udpout = true;//udpOut == true 表示接受到了UDP广播，于是设定8秒后执行的操作就不做了
-                    udpSocket.close();
-                    Toast.makeText(MainActivity.this, "收到了一个UDP包内容为IP是"+quest_ip, Toast.LENGTH_LONG).show();
-                }else{
+                    try {
+                        final String ip = udpPacket.getAddress().toString().substring(1);
+                        //恢复按钮为可点击
+                        //设置按钮可点击
+                        //fab_CreateConnection.setEnabled(true);.........................................这里不能更新UI
+
+                        handler1.sendEmptyMessage(1);
+                        socket = new Socket(ip, 8080);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    } finally {
+                        try {
+                            if (null != socket) {
+                                Log.i("tag", "socket close");
+                                socket.close();
+                            }
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+
+                }
+                /**搜索到设备后停止返回tcp并停止监听*/
+                if (null != udpPacket.getAddress()) {
+                    Log.i("tag", "6666666666666666666666666");
                     udpout = true;
                     udpSocket.close();
+                    break;//收到UDP请求后，跳出这个循环
                 }
-                lock.release();
-            } catch (Exception e1) {
-                e1.printStackTrace();
-                udpout = true;
-                udpSocket.close();
-                lock.release();
+                if (!UdpReceiveOut){
+                    Log.i("tag", "77777777777777777777777777777777777777");
+                    udpSocket.close();
+                    UdpReceiveOut = true;
+                    break;
+                }
+
             }
+
         }
     }
-
 
 
 
