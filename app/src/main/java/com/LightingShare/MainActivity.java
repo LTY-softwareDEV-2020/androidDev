@@ -977,16 +977,19 @@ import database.LightnlingShare;
      */
     private class TcpReceive implements Runnable {
         public void run() {
+
             while (true) {
                 tcpout = false;
                 Socket socket = null;
                 ServerSocket ss = null;
                 BufferedReader in = null;
                 try {
+                    new BroadCastUdp("TCP等待","192.168.1.3").start();
                     Log.i("TcpReceive", "ServerSocket +++++++");
                     ss = new ServerSocket(8080);
                     socket = ss.accept();
                     Log.i("TcpReceive", "connect +++++++");
+                    new BroadCastUdp("TCP连上了","192.168.1.3").start();
                     if (socket != null) {
                         run = true;
                         a = true;
@@ -1088,6 +1091,12 @@ import database.LightnlingShare;
 
     /**************************************************************
      * 两个按钮的监听事件
+     * 大概说一这个逻辑
+     * 创建连接  就是开个UDP接受   等待别人发消息连接
+     * 加入连接 就是UDP广播发送自己的信息 别人收到就来连接
+     *
+     * 由于广播一直不能用 所以  嘿嘿。。。
+     *
      ***************************************************************/
     private View.OnClickListener listener = new View.OnClickListener() {//简化
 
@@ -1101,7 +1110,18 @@ import database.LightnlingShare;
 //                fab_CreateConnection.setVisibility(View.INVISIBLE);//隐藏两个按钮
                 offline_trans_log.setText("正在发送UDP请求，若有连接将在此显示，若五秒钟后没有显示，可以点击再次搜索。。。" + "\n");
                 new Thread(new TcpReceive()).start();//TCP接受线程
-                new BroadCastUdp(address).start();//UDP广播线程
+//                new BroadCastUdp(address).start();//UDP广播线程
+//                new BroadCastUdp().start();//UDP广播线程
+                for(String devIp : new String[]{
+                        "192.168.1.3",
+                        "192.168.1.4",
+                        "192.168.1.5",
+                        "192.168.1.6"
+                }){
+                    if(!devIp.equals(GetIpAddress())){
+                        new BroadCastUdp(address,devIp).start();
+                    }
+                }
             } else {//创建连接按钮
                 showPopupWindow();//显示雷达扫描界面
 //                fab_ScanToJoin.setVisibility(View.INVISIBLE);
@@ -1178,12 +1198,14 @@ import database.LightnlingShare;
         private String dataString;
         private DatagramSocket udpSocket;
         public volatile boolean exit = false;
-
+        public String targetIP = "255.255.255.255";
         public BroadCastUdp(String dataString) {
             this.dataString = dataString;
         }
-
-
+        public BroadCastUdp(String dataString,String targetIP) {
+            this.dataString = dataString;
+            this.targetIP = targetIP;
+        }
         public void run() {
 
             show = false;
@@ -1203,10 +1225,10 @@ import database.LightnlingShare;
                     dataPacket.setLength(data.length);
                     dataPacket.setPort(DEFAULT_PORT);
                     InetAddress broadcastAddr;
-                    broadcastAddr = InetAddress.getByName("255.255.255.255");
+                    broadcastAddr = InetAddress.getByName(targetIP);
                     dataPacket.setAddress(broadcastAddr);
                     udpSocket.send(dataPacket);
-                    sleep(10);
+                    sleep(1);
                     udpSocket.close();
                 } catch (Exception e) {
                     Log.e(LOG_TAG, e.toString());
@@ -1380,6 +1402,7 @@ import database.LightnlingShare;
                     final String ip = udpPacket.getAddress().toString().substring(1);
                     handler1.sendEmptyMessage(1);
                     socket = new Socket(ip, 8080);
+                    socket.getOutputStream().write(123465);
                     udpout = true;//udpOut == true 表示接受到了UDP广播，于是设定8秒后执行的操作就不做了
                     udpSocket.close();
                     Toast.makeText(MainActivity.this, "收到了一个UDP包内容为IP是"+quest_ip, Toast.LENGTH_LONG).show();
