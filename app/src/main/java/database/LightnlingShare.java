@@ -14,7 +14,7 @@ public class LightnlingShare extends SQLiteOpenHelper {
      * 以下是数据库相关的字段，以及表名等常量
      **/
     //数据库名字
-    public static final String DATABASE_NAME = "LingDong_DataBase";
+    public static final String DATABASE_NAME = "LightningShare_DataBase";
 
 
     //uesr_info_android 安卓用户信息 数据表相关的常量字段定义如下

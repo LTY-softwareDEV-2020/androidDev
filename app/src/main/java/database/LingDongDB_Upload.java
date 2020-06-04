@@ -12,7 +12,7 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-public class LingDongDB_Upload extends Thread {
+public class LightningShareDB_Upload extends Thread {
 
     public String url;
     public JSONObject json;
@@ -23,7 +23,7 @@ public class LingDongDB_Upload extends Thread {
      */
 
     //构造方法
-    public LingDongDB_Upload(String url, JSONObject json) {
+    public LightningShareDB_Upload(String url, JSONObject json) {
         this.url = url;
         this.json = json;
     }

@@ -326,8 +326,8 @@ public class Files_Trans_Activity extends Activity {
             try {
                 // 接收文件名
                 Socket socket = server.accept();
-                //接受到的文件存放在SD卡LingDong目录下面
-                String pathdir = Environment.getExternalStorageDirectory().getPath() + "/LingDong";
+                //接受到的文件存放在SD卡LightningShare目录下面
+                String pathdir = Environment.getExternalStorageDirectory().getPath() + "/LightningShare";
                 byte[] inputByte = null;
                 long length = 0;
                 DataInputStream dis = null;
@@ -452,7 +452,7 @@ public class Files_Trans_Activity extends Activity {
                         /*************************文件发送完成后，将数据库中的文件发送信息的数据发送到服务端，并清空数据表****************************/
                         try {
                             //要首先判断这个数据表是不是为空，即当没有进行文件传输的时候，这个表应该是空的，如果这个时候仍然执行，那么应用就会闪退
-                            Cursor cursor = MainActivity.dbWriter.query(MainActivity.lingdongdb.TABLE_User_Using_Files_Trans_Android, null, null, null, null, null, null);
+                            Cursor cursor = MainActivity.dbWriter.query(MainActivity.LightningSharedb.TABLE_User_Using_Files_Trans_Android, null, null, null, null, null, null);
                             cursor.getCount();
                             if (cursor.getCount() > 0) {
                                 MainActivity.get_User_Using_Files_Trans_Android();

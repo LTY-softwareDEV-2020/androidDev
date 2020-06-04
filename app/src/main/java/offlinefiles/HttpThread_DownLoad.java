@@ -103,7 +103,7 @@ public class HttpThread_DownLoad extends Thread {
                 //截取字符串ResultFromPHP，只保存文件名
                 String filemd5name = echoFromPHP.substring(34);//本地测试的话，这个值是不同的，截取字符串的一段
 
-                File file = new File(Environment.getExternalStorageDirectory().getPath() + "/LingDong/");
+                File file = new File(Environment.getExternalStorageDirectory().getPath() + "/LightningShare/");
                 //如果目标文件已经存在，则删除。产生覆盖旧文件的效果
                 if (!file.exists()) {
                     file.mkdir();//delete();
@@ -129,8 +129,8 @@ public class HttpThread_DownLoad extends Thread {
                     int len;
                     // 输出的文件流
                     /**********这样写会默认存储到app内部的data文件夹里面，会写入失败，应该指定写入的位置*********/
-                    //下面这句话表示文件存储位置为Environment.getExternalStorageDirectory().getPath()+"/LingDong"+".jpg"
-                    //即文件路径以及文件名为  如下所示   sdcard/lingDong.jpg
+                    //下面这句话表示文件存储位置为Environment.getExternalStorageDirectory().getPath()+"/LightningShare"+".jpg"
+                    //即文件路径以及文件名为  如下所示   sdcard/LightningShare.jpg
                     OutputStream os = new FileOutputStream(file + "/" + filemd5name);
                     // 开始读取
                     while ((len = is.read(bs)) != -1) {

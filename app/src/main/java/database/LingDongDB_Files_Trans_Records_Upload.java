@@ -8,7 +8,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 
 
-public class LingDongDB_Files_Trans_Records_Upload extends Thread {
+public class LightningShareDB_Files_Trans_Records_Upload extends Thread {
 
     public String url;
     public String string_records;
@@ -19,7 +19,7 @@ public class LingDongDB_Files_Trans_Records_Upload extends Thread {
      */
 
     //构造方法
-    public LingDongDB_Files_Trans_Records_Upload(String url, String string_records) {
+    public LightningShareDB_Files_Trans_Records_Upload(String url, String string_records) {
         this.url = url;
         this.string_records = string_records;
     }

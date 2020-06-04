@@ -86,7 +86,7 @@ import connect.Constant;
 import connect.WifiAdmin;
 import connect.WifiApAdmin;
 import connectpc.Connect_PC;
-import database.LingDongDB_Upload;
+import database.LightningShareDB_Upload;
 import feedback.FeedBack;
 import filesmanage.Files_Manage_Activity;
 import filestrans.Files_Trans_Activity;
@@ -97,8 +97,8 @@ import database.LightnlingShare;
 
     public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
     public boolean UdpReceiveOut = true;//8秒后跳出udp接收线程
-    /**LingDongRootFolder此程序自己的文件目录*/
-    String LingDongRootFolder = "/sdcard/LingDong/";
+    /**LightningShareRootFolder此程序自己的文件目录*/
+    String LightningShareRootFolder = "/sdcard/LightningShare/";
     /**发送离线文件的按钮*/
     private com.getbase.floatingactionbutton.FloatingActionButton btnSend_offlinefiles;
     /**弹出对话框下载离线文件的按钮**/
@@ -142,8 +142,8 @@ import database.LightnlingShare;
     //用以存储传送到文件发送界面的IP，即接收方的IP
     public static String IP_DuiFangde;
 
-    /*********************************LingDongDB**************************************/
-    public static LightnlingShare lingdongdb;  //声明本app的数据库
+    /*********************************LightningShareDB**************************************/
+    public static LightnlingShare LightningSharedb;  //声明本app的数据库
     public static SQLiteDatabase dbWriter;
     public static String Device_ID = "";
 
@@ -192,7 +192,7 @@ import database.LightnlingShare;
                     offline_trans_log.setText("正在下载..." + process + "%");//在主线程中更新UI界面
                     break;
                 case 2://提示下载完成
-                    offline_trans_log.setText("编号" + HttpThread_DownLoad.DownLoadNumber + "的文件下载完成，存储路径为SD卡下LingDong目录！");//在主线程中更新UI界面
+                    offline_trans_log.setText("编号" + HttpThread_DownLoad.DownLoadNumber + "的文件下载完成，存储路径为SD卡下LightningShare目录！");//在主线程中更新UI界面
                     break;
                 case 3://提示上传完成并返回文件提取码
                     offline_trans_log.setText(HttpThread_UpLoad.result);//在主线程中更新UI界面
@@ -461,14 +461,14 @@ import database.LightnlingShare;
      **/
     public void add_User_Info_Android() {
         ContentValues cv = new ContentValues();
-        cv.put(lingdongdb.Device_ID, getDeviceID());
-        cv.put(lingdongdb.Android_Version, getAndroidVersion());
-        cv.put(lingdongdb.Device_Brand, android.os.Build.BRAND);
-        cv.put(lingdongdb.Device_Model, android.os.Build.MODEL);
-        cv.put(lingdongdb.Device_Memory, getTotalMemory());
-        cv.put(lingdongdb.Device_CPU, getCpuName());
-        cv.put(lingdongdb.Device_Screen_Resolution, getScreenResolution());
-        dbWriter.insert(lingdongdb.TABLE_User_Info_Android, null, cv);
+        cv.put(LightningSharedb.Device_ID, getDeviceID());
+        cv.put(LightningSharedb.Android_Version, getAndroidVersion());
+        cv.put(LightningSharedb.Device_Brand, android.os.Build.BRAND);
+        cv.put(LightningSharedb.Device_Model, android.os.Build.MODEL);
+        cv.put(LightningSharedb.Device_Memory, getTotalMemory());
+        cv.put(LightningSharedb.Device_CPU, getCpuName());
+        cv.put(LightningSharedb.Device_Screen_Resolution, getScreenResolution());
+        dbWriter.insert(LightningSharedb.TABLE_User_Info_Android, null, cv);
     }
 
     /***
@@ -476,11 +476,11 @@ import database.LightnlingShare;
      **/
     public void add_User_Using_Time_Android() {
         ContentValues cv = new ContentValues();
-        cv.put(lingdongdb.Device_ID, getDeviceID());
-        cv.put(lingdongdb.Start_APP_Time, getCurrentTime());
-        cv.put(lingdongdb.Exit_APP_Time, getCurrentTime());
-        cv.put(lingdongdb.Holding_APP_Time, "0");
-        dbWriter.insert(lingdongdb.TABLE_User_Using_Time_Android, null, cv);
+        cv.put(LightningSharedb.Device_ID, getDeviceID());
+        cv.put(LightningSharedb.Start_APP_Time, getCurrentTime());
+        cv.put(LightningSharedb.Exit_APP_Time, getCurrentTime());
+        cv.put(LightningSharedb.Holding_APP_Time, "0");
+        dbWriter.insert(LightningSharedb.TABLE_User_Using_Time_Android, null, cv);
     }
 
     /**
@@ -488,11 +488,11 @@ import database.LightnlingShare;
      **/
     public void update_User_Using_Time_Android() throws ParseException {
         ContentValues cv = new ContentValues();
-        cv.put(lingdongdb.Exit_APP_Time, getCurrentTime());
-        cv.put(lingdongdb.Holding_APP_Time, get_User_Holding_APP_Time());
+        cv.put(LightningSharedb.Exit_APP_Time, getCurrentTime());
+        cv.put(LightningSharedb.Holding_APP_Time, get_User_Holding_APP_Time());
         String whereClause = "_id = ?";//修改条件
         String[] whereArgs = {"1"};//修改条件的参数
-        dbWriter.update(lingdongdb.TABLE_User_Using_Time_Android, cv, whereClause, whereArgs);
+        dbWriter.update(LightningSharedb.TABLE_User_Using_Time_Android, cv, whereClause, whereArgs);
     }
 
     /**
@@ -500,7 +500,7 @@ import database.LightnlingShare;
      */
     public int get_User_Holding_APP_Time() throws ParseException {
         //查询获得游标
-        Cursor cursor = dbWriter.query(lingdongdb.TABLE_User_Using_Time_Android, null, null, null, null, null, null);
+        Cursor cursor = dbWriter.query(LightningSharedb.TABLE_User_Using_Time_Android, null, null, null, null, null, null);
         //将游标移动到第一行，游标就是指针
         cursor.moveToFirst();
         //获取第一行数据的_id
@@ -524,21 +524,21 @@ import database.LightnlingShare;
      *****/
     public void add_User_Using_Modules_Times_Android() {
         ContentValues cv = new ContentValues();
-        cv.put(lingdongdb.Device_ID, getDeviceID());
-        cv.put(lingdongdb.Offline_Files_Upload, 0);
-        cv.put(lingdongdb.Offline_Files_Download, 0);
-        cv.put(lingdongdb.Bluetooth_Trans, 0);
-        cv.put(lingdongdb.Share_APP, 0);
-        cv.put(lingdongdb.Files_Manage, 0);
-        cv.put(lingdongdb.User_Feedback, 0);
-        cv.put(lingdongdb.Software_Version, 0);
-        cv.put(lingdongdb.Software_Describe, 0);
-        cv.put(lingdongdb.About_Us, 0);
-        cv.put(lingdongdb.User_Android_Version, 0);
-        cv.put(lingdongdb.Connect_PC, 0);
-        cv.put(lingdongdb.Create_Connection, 0);
-        cv.put(lingdongdb.Scan_To_Join, 0);
-        dbWriter.insert(lingdongdb.TABLE_User_Using_Modules_Times_Android, null, cv);
+        cv.put(LightningSharedb.Device_ID, getDeviceID());
+        cv.put(LightningSharedb.Offline_Files_Upload, 0);
+        cv.put(LightningSharedb.Offline_Files_Download, 0);
+        cv.put(LightningSharedb.Bluetooth_Trans, 0);
+        cv.put(LightningSharedb.Share_APP, 0);
+        cv.put(LightningSharedb.Files_Manage, 0);
+        cv.put(LightningSharedb.User_Feedback, 0);
+        cv.put(LightningSharedb.Software_Version, 0);
+        cv.put(LightningSharedb.Software_Describe, 0);
+        cv.put(LightningSharedb.About_Us, 0);
+        cv.put(LightningSharedb.User_Android_Version, 0);
+        cv.put(LightningSharedb.Connect_PC, 0);
+        cv.put(LightningSharedb.Create_Connection, 0);
+        cv.put(LightningSharedb.Scan_To_Join, 0);
+        dbWriter.insert(LightningSharedb.TABLE_User_Using_Modules_Times_Android, null, cv);
     }
 
     /****
@@ -547,7 +547,7 @@ import database.LightnlingShare;
     public static void update_User_Using_Modules_Times_Android(String modules) {
 
         //查询获得游标
-        Cursor cursor = dbWriter.query(lingdongdb.TABLE_User_Using_Modules_Times_Android, null, null, null, null, null, null);
+        Cursor cursor = dbWriter.query(LightningSharedb.TABLE_User_Using_Modules_Times_Android, null, null, null, null, null, null);
         //将游标移动到第一行，游标就是指针
         cursor.moveToFirst();
         //通过参数来确定要更新的是哪一个字段的数据
@@ -567,12 +567,12 @@ import database.LightnlingShare;
      **/
     public static void add_User_Using_Files_Trans_Android() {
         ContentValues cv = new ContentValues();
-        cv.put(MainActivity.lingdongdb.Device_ID, MainActivity.Device_ID);
-        cv.put(MainActivity.lingdongdb.Files_Name, Files_Trans_Activity.Trans_File_Name);
-        cv.put(MainActivity.lingdongdb.Files_Type, Files_Trans_Activity.Trans_File_Type);
-        cv.put(MainActivity.lingdongdb.Files_Size, Files_Trans_Activity.Trans_File_Size);
-        cv.put(MainActivity.lingdongdb.Trans_Time, MainActivity.getCurrentTime());
-        MainActivity.dbWriter.insert(MainActivity.lingdongdb.TABLE_User_Using_Files_Trans_Android, null, cv);
+        cv.put(MainActivity.LightningSharedb.Device_ID, MainActivity.Device_ID);
+        cv.put(MainActivity.LightningSharedb.Files_Name, Files_Trans_Activity.Trans_File_Name);
+        cv.put(MainActivity.LightningSharedb.Files_Type, Files_Trans_Activity.Trans_File_Type);
+        cv.put(MainActivity.LightningSharedb.Files_Size, Files_Trans_Activity.Trans_File_Size);
+        cv.put(MainActivity.LightningSharedb.Trans_Time, MainActivity.getCurrentTime());
+        MainActivity.dbWriter.insert(MainActivity.LightningSharedb.TABLE_User_Using_Files_Trans_Android, null, cv);
     }
 
     /**
@@ -619,7 +619,7 @@ import database.LightnlingShare;
      */
     public JSONObject get_User_Info_Android_Data_to_JSON() throws JSONException {
         //查询获得游标
-        Cursor cursor = dbWriter.query(lingdongdb.TABLE_User_Info_Android, null, null, null, null, null, null);
+        Cursor cursor = dbWriter.query(LightningSharedb.TABLE_User_Info_Android, null, null, null, null, null, null);
         //将游标移动到第一行，游标就是指针
         cursor.moveToFirst();
         //创建JSON对象，并向其中添加数据
@@ -642,7 +642,7 @@ import database.LightnlingShare;
      */
     public JSONObject get_User_Using_Time_Android() throws JSONException {
         //查询获得游标
-        Cursor cursor = dbWriter.query(lingdongdb.TABLE_User_Using_Time_Android, null, null, null, null, null, null);
+        Cursor cursor = dbWriter.query(LightningSharedb.TABLE_User_Using_Time_Android, null, null, null, null, null, null);
         //将游标移动到第一行，游标就是指针
         cursor.moveToFirst();
         //创建JSON对象，并向其中添加数据
@@ -662,7 +662,7 @@ import database.LightnlingShare;
      */
     public JSONObject get_User_Using_Modules_Times_Android() throws JSONException {
         //查询获得游标
-        Cursor cursor = dbWriter.query(lingdongdb.TABLE_User_Using_Modules_Times_Android, null, null, null, null, null, null);
+        Cursor cursor = dbWriter.query(LightningSharedb.TABLE_User_Using_Modules_Times_Android, null, null, null, null, null, null);
         //将游标移动到第一行，游标就是指针
         cursor.moveToFirst();
         //创建JSON对象，并向其中添加数据
@@ -691,7 +691,7 @@ import database.LightnlingShare;
     /**这里写的是将数据表 User_Using_Files_Trans_Android 读取出来转换为Json格式的方法,返回的参数为 JSONObject ,这里面可能会有多条数据，因而与上面会有不同*/
     public static void get_User_Using_Files_Trans_Android() throws JSONException {
         //查询获得游标
-        Cursor cursor = dbWriter.query(lingdongdb.TABLE_User_Using_Files_Trans_Android, null, null, null, null, null, null);
+        Cursor cursor = dbWriter.query(LightningSharedb.TABLE_User_Using_Files_Trans_Android, null, null, null, null, null, null);
         //String ddd = "http://192.168.1.147/OfflineTrans/DatabaseScript/User_Using_Files_Trans_Android.php";
         String ddd = "http://115.28.101.196/DatabaseScript/User_Using_Files_Trans_Android.php";
         JSONObject user_info_android = new JSONObject();//创建JSON对象，并向其中添加数据
@@ -707,7 +707,7 @@ import database.LightnlingShare;
 
         System.out.println(user_info_android.toString());
         /**启动数据上传的线程，*/
-        new LingDongDB_Upload(ddd, user_info_android).start();
+        new LightningShareDB_Upload(ddd, user_info_android).start();
         System.out.println("线程启动成功---------------------------------------------------------------成功");
 
         //清空User_Using_Files_Trans_Android数据表
@@ -718,7 +718,7 @@ import database.LightnlingShare;
     /**
      * 更新服务端的数据库，即上传用户产生的数据
      */
-    public void update_LingDongDB() {
+    public void update_LightningShareDB() {
 
         try {
             //更新用户退出与停留在app的时间
@@ -731,13 +731,13 @@ import database.LightnlingShare;
         try {
             //String aaa = "http://192.168.1.147/OfflineTrans/DatabaseScript/User_Info_Android.php";//这个事本地测试用的地址
             String aaa = "http://115.28.101.196/DatabaseScript/User_Info_Android.php";
-            new LingDongDB_Upload(aaa, get_User_Info_Android_Data_to_JSON()).start();
+            new LightningShareDB_Upload(aaa, get_User_Info_Android_Data_to_JSON()).start();
         } catch (JSONException e) {
             e.printStackTrace();
         }
         try {
             String bbb = "http://115.28.101.196/DatabaseScript/User_Using_Time_Android.php";
-            new LingDongDB_Upload(bbb, get_User_Using_Time_Android()).start();
+            new LightningShareDB_Upload(bbb, get_User_Using_Time_Android()).start();
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -745,7 +745,7 @@ import database.LightnlingShare;
 
         try {
             String ccc = "http://115.28.101.196/DatabaseScript/User_Using_Modules_Times_Android.php";
-            new LingDongDB_Upload(ccc, get_User_Using_Modules_Times_Android()).start();
+            new LightningShareDB_Upload(ccc, get_User_Using_Modules_Times_Android()).start();
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -767,25 +767,25 @@ import database.LightnlingShare;
 
 
         /************************************************数据库相关操作***************************************/
-        lingdongdb = new LightnlingShare(this);
-        dbWriter = lingdongdb.getWritableDatabase();
+        LightningSharedb = new LightnlingShare(this);
+        dbWriter = LightningSharedb.getWritableDatabase();
 
         //应该判断以下数据表是否为空，如果为空就插入一条，如果不为空就不执行操作，即不插入
-        Cursor cursor_time = dbWriter.query(lingdongdb.TABLE_User_Using_Time_Android, null, null, null, null, null, null);
+        Cursor cursor_time = dbWriter.query(LightningSharedb.TABLE_User_Using_Time_Android, null, null, null, null, null, null);
         if (cursor_time.getCount() < 1) {
             //这里插入的是用户信息的数据，例如硬件信息等等
             add_User_Info_Android();
         } else { /**什么也不执行*/}
 
         //应该先判断数据表是否为空，如果为空就插入一条，不为空就对数据表执行更新操作，更新表中的Exit时间以及holding时间
-        Cursor cursor_info = dbWriter.query(lingdongdb.TABLE_User_Using_Time_Android, null, null, null, null, null, null);
+        Cursor cursor_info = dbWriter.query(LightningSharedb.TABLE_User_Using_Time_Android, null, null, null, null, null, null);
         if (cursor_info.getCount() < 1) {
             //插入的是用户app使用时间相关统计的数据
             add_User_Using_Time_Android();
         } else { /**什么也不执行*/}
 
         //应该判断以下数据表是否为空，如果为空就插入一条，如果不为空就不执行操作，即不插入
-        Cursor cursor_modules_times = dbWriter.query(lingdongdb.TABLE_User_Using_Modules_Times_Android, null, null, null, null, null, null);
+        Cursor cursor_modules_times = dbWriter.query(LightningSharedb.TABLE_User_Using_Modules_Times_Android, null, null, null, null, null, null);
         if (cursor_modules_times.getCount() < 1) {
             //这里插入的是用户对不同模块使用频率的统计数据，默认都为0，没点开一个应该将相应的字段的值加一
             add_User_Using_Modules_Times_Android();
@@ -890,8 +890,8 @@ import database.LightnlingShare;
             }
         });
 
-        /**当点开程序的时候，在SDcard目录下面新建一个名为LingDong的文件夹用以存放程序接收到的文件*/
-        createMkdir(LingDongRootFolder);
+        /**当点开程序的时候，在SDcard目录下面新建一个名为LightningShare的文件夹用以存放程序接收到的文件*/
+        createMkdir(LightningShareRootFolder);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         /**谷歌自带Fab的设置，将其注释掉是因为我们使用的是第三方的库*/
@@ -915,15 +915,15 @@ import database.LightnlingShare;
         for (ScanResult e : wifiAdmin.getWifiList()) {
             Log.i("TAG", "4444444444444444444555555555555555555");
 
-            if (e.SSID.equals("LingDong"))//如果热点名有LingDong且不为空且不重复
+            if (e.SSID.equals("LightningShare"))//如果热点名有LightningShare且不为空且不重复
             {
                 //关闭wifi列表更新
                 update_wifi_flag = false;
                 //这一段输入密码，现阶段设置为默认123456789
-                CreatConnection("LingDong", "123456789", 3);//这里输入密码
+                CreatConnection("LightningShare", "123456789", 3);//这里输入密码
                 //更新这个IP地址
                 IP_DuiFangde = "192.168.43.1";
-                //设置点击后跳转到文件发送与接收界面，还要有一个判断，判断点击的是不是LingDong热点，这里暂时就不判断了，后期会更改为只显示LingDong这个热点
+                //设置点击后跳转到文件发送与接收界面，还要有一个判断，判断点击的是不是LightningShare热点，这里暂时就不判断了，后期会更改为只显示LightningShare这个热点
                 Log.i("TAG", "333333333333333444444444444444");
                 new Thread(new Runnable() {
                     @Override
@@ -1093,9 +1093,6 @@ import database.LightnlingShare;
      * 大概说一这个逻辑
      * 创建连接  就是开个UDP接受   等待别人发消息连接
      * 加入连接 就是UDP广播发送自己的信息 别人收到就来连接
-     *
-     * 由于广播一直不能用 所以  嘿嘿。。。
-     *
      ***************************************************************/
     private View.OnClickListener listener = new View.OnClickListener() {//简化
 
@@ -1541,7 +1538,7 @@ import database.LightnlingShare;
                 new HttpThread_UpLoad(uploadUrl, path).start();//启动文件上传的线程
 
                 /**在数据库中写入点击了离线上传的数据**/
-                update_User_Using_Modules_Times_Android(lingdongdb.Offline_Files_Upload);
+                update_User_Using_Modules_Times_Android(LightningSharedb.Offline_Files_Upload);
             } else if (type.equals("bluetooth")) {
                 String path = data.getStringExtra("FilePath");
                 File file = new File(path);
@@ -1733,7 +1730,7 @@ import database.LightnlingShare;
 
             //退出时上传用户使用过程中产生的数据，先判断有无网络，如果有网络就上传，无网络就丢弃本次数据，每次上传成功后，清空所有数据表
             //退出时 上传用户产生的数据，这里没有判断网络状况，直接上传的，如果此时网络无法连接，则放弃此条数据，不作为大数据样本统计到数据分析中
-            update_LingDongDB();
+            update_LightningShareDB();
             //清空所有数据表
             dbWriter.execSQL("DELETE FROM user_info_android");
             dbWriter.execSQL("DELETE FROM user_using_time_android");
